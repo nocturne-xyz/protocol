@@ -6,9 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --build",
     "build-all-circuits": "scripts/build_all.sh",
-    "build:deps": "../../scripts/install_base_deps.sh && ./scripts/install_deps.sh",
     "build:joinsplit": "scripts/joinsplit/build.sh",
     "build:subtreeupdate": "scripts/subtreeupdate/build.sh",
     "build:canonAddrSigCheck": "scripts/canonAddrSigCheck/build.sh",

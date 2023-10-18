@@ -4,7 +4,7 @@ SCRIPT_DIR=$(dirname "$0")
 ROOT_SCRIPT_DIR="$SCRIPT_DIR/../"
 ROOT_DIR="$SCRIPT_DIR/../../../../"
 CIRCUIT_ARTIFACTS_DIR="$ROOT_DIR/circuit-artifacts"
-PHASE1_PATH="$SCRIPT_DIR/../../data/powersOfTau28_hez_final_23.ptau"
+PHASE1_PATH="$SCRIPT_DIR/../../data/powersOfTau28_hez_final_22.ptau"
 CIRCUIT_PATH="$SCRIPT_DIR/../../circuits/$CIRCUIT_NAME.circom"
 BUILD_DIR="$CIRCUIT_ARTIFACTS_DIR/$CIRCUIT_NAME"
 OUTPUT_DIR="$BUILD_DIR"/"$CIRCUIT_NAME"_cpp
@@ -13,7 +13,7 @@ CONTRACTS_DIR="$ROOT_DIR/packages/contracts/contracts"
 if [ -f "$PHASE1_PATH" ]; then
     echo "Found Phase 1 ptau file"
 else
-    echo "Phase 1 ptau file not found. Please download it by running `yarn download-big-ptau` from the package root"
+    echo "Phase 1 ptau file not found. Please download it by running `yarn download-big-ptau` from the `circuits` package directory"
     echo "Exiting..."
     exit 1
 fi
