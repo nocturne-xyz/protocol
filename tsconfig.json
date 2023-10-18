@@ -1,0 +1,39 @@
+{
+	"exclude": ["dist", "node_modules", "tests", "coverage"],
+	"include": ["src/**/*.ts"],
+	"compilerOptions": {
+	  "declaration": true,
+	  "declarationMap": true,
+	  "esModuleInterop": true,
+	  "allowSyntheticDefaultImports": true,
+	  "forceConsistentCasingInFileNames": true,
+	  "lib": ["es2022", "dom"],
+	  "module": "commonjs",
+	  "moduleResolution": "node",
+	  "noEmitOnError": true,
+	  "noFallthroughCasesInSwitch": true,
+	  "noImplicitAny": true,
+	  "noImplicitReturns": false,
+	  "noImplicitOverride": true,
+	  "noUnusedLocals": true,
+	  "preserveSymlinks": true,
+	  "preserveWatchOutput": true,
+	  "pretty": false,
+	  "resolveJsonModule": true,
+	  "sourceMap": true,
+	  "target": "es2021",
+	  "strict": true,
+	  "allowJs": true,
+	  "typeRoots": ["node_modules/@types", "types"]
+	},
+  
+	"references": [
+	  {
+		"path": "./packages/contracts"
+	  },
+	  {
+		"path": "./packages/circuits"
+	  }
+	]
+  }
+  

@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "exclude": [
+    "artifacts",
+    "cache",
+    "foundry_artifacts",
+    "contracts",
+    "node_modules",
+    "dist",
+    "config",
+    "scripts",
+    "tmp.ts",
+    "hardhat.config.ts"
+  ],
+  "include": ["index.ts", "src/**/*.ts", "scripts/*.ts", "package.json"]
+}

@@ -1,0 +1,50 @@
+name: Build and Test Packages
+on: [push]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "v18.12.1"
+          cache: "yarn"
+      - name: corepack enable
+        run: corepack enable
+      - name: install foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly-e15e33a07c0920189fc336391f538c3dad53da73
+      - name: install Rapidsnark dependencies
+        run: sudo apt-get install -y build-essential libgmp-dev libsodium-dev nasm nlohmann-json3-dev
+      - name: install docker
+        run: sudo apt-get install -y docker
+      - name: yarn install
+        run: |
+          yarn install --immutable
+      - name: install deps
+        run: |
+          yarn install-deps
+      - name: Yarn lint
+        run: |
+          yarn lint
+      - name: yarn prettier
+        run: |
+          yarn prettier:check
+      - name: yarn build
+        run: |
+          yarn build
+      - name: yarn test:unit
+        run: |
+          yarn test:unit
+      - name: yarn test:fork
+        run: |
+          yarn test:fork

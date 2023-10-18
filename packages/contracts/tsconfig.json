@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDirs": ["./src", "deployer"],
+    "noImplicitOverride": false
+  },
+  "exclude": [
+    "artifacts",
+    "cache",
+    "foundry_artifacts",
+    "contracts",
+    "node_modules",
+    "dist",
+    "config",
+    "tmp.ts",
+    "hardhat.config.ts"
+  ],
+  "include": ["index.ts", "src/**/*.ts", "deployer", "package.json"],
+  "files": ["./hardhat.config.ts"]
+}

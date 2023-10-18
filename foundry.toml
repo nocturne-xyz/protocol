@@ -1,0 +1,42 @@
+[profile.default]
+solc_version = '0.8.17'        # Version of solc that we use
+remappings = [                # Libraries that we use from node_modules and are used by the smart contracts
+"@zk-kit/=lib/zk-kit/packages/",
+"@openzeppelin/=node_modules/@openzeppelin/",
+"forge-std/=lib/forge-std/src/"
+]
+optimizer = true              # Enable or disable the solc optimizer
+optimizer_runs = 500          # The number of optimizer runs
+verbosity = 0                 # The verbosity of tests
+bytecode_hash = "ipfs"        # For deterministic code
+block_timestamp = 1_685_721_539  # Timestamp for tests (non-zero)
+src = 'packages/contracts/contracts'
+test = 'packages/contracts/contracts/test'
+out = 'packages/contracts/foundry_artifacts'
+ffi = true
+gas_reports = ["Teller", "Handler", "CommitmentTreeManagerHandler", "JoinSplitVerifier", "SubtreeUpdateVerifier", "TestDepositManager", "TestCommitmentTreeManager", "TestBalanceManager"]
+
+# silence warnings
+# 2018 - foundry json library modifies state but solc doesn't recognize
+ignored_error_codes = [2018]
+libs = ["node_modules", "lib"]
+
+fs_permissions = [{ access = "read", path = "./"}]
+
+[fuzz]
+runs = 100
+
+[invariant]
+optimizer = true
+runs = 10     # The number of calls to make in the invariant tests
+depth = 100    # The number of times to run the invariant tests
+call_override = false  # Override calls
+fail_on_revert = true   # Fail the test if the contract reverts
+
+[profile.deep.invariant]
+runs      = 100  # The number of calls to make in the invariant tests
+depth     = 200  # The number of times to run the invariant tests
+
+[profile.deep.fuzz]
+optimizer = true
+runs      = 50_000

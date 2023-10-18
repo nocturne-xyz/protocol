@@ -1,0 +1,49 @@
+node_modules/
+yarn-error.log
+**/tsconfig.tsbuildinfo
+dist/
+cache/
+lib/
+/db
+
+.DS_Store
+**/.DS_Store"
+MyLogFile.log
+**/MyLogFile.log
+
+**/.env
+**/redis-data
+
+# ignore big ptau file for subtreeupdate
+# if needed, download it by running `yarn download-big-ptau` in `packages/circuits`
+powersOfTau28_hez_final_22.ptau
+
+.yarn/*
+.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# turbo logs
+.turbo
+
+# contract build artifacts
+contract-artifacts
+
+# circom build artifacts
+.circom
+.ptau
+.setup
+build
+circuit-artifacts/**/*.*
+!circuit-artifacts/*/*_js/*.wasm
+!circuit-artifacts/*/*_cpp/*.zkey
+!circuit-artifacts/*/*_cpp/*.json
+
+# ignore subtreeupdate because it's verification key is too huge
+circuit-artifacts/subtreeupdate
+
+.idea/
+.nvmrc
