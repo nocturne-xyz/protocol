@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build-all-circuits": "scripts/build_all.sh",
+    "build:all": "scripts/build_all.sh",
     "build:joinsplit": "scripts/joinsplit/build.sh",
     "build:subtreeupdate": "scripts/subtreeupdate/build.sh",
     "build:canonAddrSigCheck": "scripts/canonAddrSigCheck/build.sh",
