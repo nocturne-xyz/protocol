@@ -1,0 +1,24 @@
+{
+  "name": "protocol",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install-deps": "./scripts/install_deps.sh",
+    "build": "yarn build:contracts",
+    "clean": "yarn workspaces foreach run clean && rm -rf ./node_modules/.cache/turbo",
+    "test:unit": "yarn workspaces foreach run test:unit --include @nocturne-xyz/contracts",
+    "test:fork": "yarn turbo run --no-daemon test:fork --filter=@nocturne-xyz/contracts",
+    "build:circuits": "yarn workspaces foreach run build-all-circuits --include @nocturne-xyz/circuits",
+    "build:contracts": "yarn workspaces foreach run build --include @nocturne-xyz/contracts",
+    "publish-packages": "yarn clean && yarn build && changeset version && yarn workspaces foreach --no-private --from '@nocturne-xyz/*' npm publish --access public --tolerate-republish && yarn changeset tag"
+  },
+  "packageManager": "yarn@3.2.4",
+  "devDependencies": {
+    "hardhat": "^2.18.1",
+    "lefthook": "^1.5.2",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "turbo": "^1.10.15"
+  }
+}

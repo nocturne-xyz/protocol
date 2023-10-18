@@ -1,0 +1,13 @@
+node_modules/
+cache/
+artifacts/
+coverage/
+coverage.json
+.env
+src.ts/
+src/
+dist/
+foundry_artifacts/
+cache_hardhat/
+.openzeppelin
+deploys
