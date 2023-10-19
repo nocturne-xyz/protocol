@@ -32,6 +32,9 @@ jobs:
       - name: yarn install
         run: |
           yarn install --immutable
+      - name: install deps
+        run: |
+          yarn install-deps
       - name: Yarn lint
         run: |
           yarn lint
