@@ -15,7 +15,7 @@
     "test:unit": "yarn workspaces foreach run test:unit",
     "publish-packages": "yarn clean && yarn install && yarn build && changeset version && yarn workspaces foreach --no-private --from '@nocturne-xyz/*' npm publish --access public --tolerate-republish && yarn changeset tag"
   },
-  "packageManager": "yarn@3.2.4",
+  "packageManager": "yarn@3.2.0",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "hardhat": "^2.18.1",
