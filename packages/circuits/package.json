@@ -15,7 +15,6 @@
     "lint": "",
     "prettier:check": "prettier --check ./scripts",
     "prettier:write": "prettier --write ./scripts",
-    "setup-rapidsnark": "scripts/setup_rapidsnark_prover.sh",
     "test:unit": ""
   },
   "dependencies": {

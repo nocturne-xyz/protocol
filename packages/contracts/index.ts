@@ -60,3 +60,8 @@ export { ProxyAdmin__factory } from './src/factories/ProxyAdmin__factory';
 export { Versioned__factory } from './src/factories/Versioned__factory';
 
 export { version } from './package.json';
+
+export async function getPoseidonBytecode(contractName: string): Promise<string> {
+  const fs = await import('fs');
+  return await fs.promises.readFile(`${__dirname}/poseidon-bytecode/${contractName}.txt`, 'utf-8');
+}
