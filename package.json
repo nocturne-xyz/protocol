@@ -11,6 +11,7 @@
     "prettier:write": "yarn workspaces foreach run prettier:write",
     "prettier:check": "yarn workspaces foreach run prettier:check",
     "lint": "yarn workspaces foreach run lint",
+    "lint:fix": "yarn workspaces foreach run lint:fix",
     "test:unit": "yarn workspaces foreach run test:unit",
     "publish-packages": "yarn clean && yarn install && yarn build && changeset version && yarn workspaces foreach --no-private --from '@nocturne-xyz/*' npm publish --access public --tolerate-republish && yarn changeset tag"
   },
