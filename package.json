@@ -8,6 +8,9 @@
     "copy-fixtures": "cp -r ../monorepo/fixtures .",
     "clean": "yarn workspaces foreach run clean",
     "build": "yarn workspaces foreach run build",
+    "prettier:write": "yarn workspaces foreach run prettier:write",
+    "prettier:check": "yarn workspaces foreach run prettier:check",
+    "lint": "yarn workspaces foreach run lint",
     "test:unit": "yarn workspaces foreach run test:unit",
     "publish-packages": "yarn clean && yarn install && yarn build && changeset version && yarn workspaces foreach --no-private --from '@nocturne-xyz/*' npm publish --access public --tolerate-republish && yarn changeset tag"
   },
