@@ -3,8 +3,6 @@ on: [push]
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    env:
-      REDISMS_SYSTEM_BINARY: "/usr/bin/redis-server"
 
     steps:
       - uses: actions/checkout@v3
