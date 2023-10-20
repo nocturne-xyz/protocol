@@ -33,12 +33,12 @@ include "lib.circom";
 //@ensures(5.2) the operation signature `(c, z)` is a valid Schnorr signature of `operationDigest` under the spend pubkey `spendPubkey`
 //@ensures(6.1) both points of the owner field of `oldNoteA`, `oldNoteAOwner`, are valid babyjubjub points
 //@ensures(6.2) both points of the owner field of `oldNoteB`, `oldNoteBOwner`, are valid babyjubjub pointi
-//@ensures(6.3) both points of the owner field of `oldNoteA`, `oldNoteAOwner`, are of order greater than 8 (i.e. it clears the cofactor)
-//@ensures(6.4) both points of the owner field of `oldNoteB`, `oldNoteBOwner`, are of order greater than 8 (i.e. it clears the cofactor)
+//@ensures(6.3) H1 of the owner field of `oldNoteA`, `oldNoteAOwner`, is of order greater than 8 (i.e. it clears the cofactor)
+//@ensures(6.4) H1 of the owner field of `oldNoteB`, `oldNoteBOwner`, is of order greater than 8 (i.e. it clears the cofactor)
 //@ensures(6.5) the owner field of `oldNoteA, `oldNoteAOwner`, is "owned" by the viewing key `vk` according to the Nocturne Stealth Address scheme
 //@ensures(6.6) the owner field of `oldNoteB, `oldNoteBOwner`, is "owned" by the viewing key `vk` according to the Nocturne Stealth Address scheme
 //@ensures(7.1) `refundAddrH1CompressedY`, along with its sign bit extracted from `pubEncodedAssetAddrWithSignBits`, represents a valid (on-curve), order-l babyjubjub point according to Nocturne's point compression scheme
-//@ensures(7.2) `refundAddrH2CompressedY`, along with its sign bit extracted from `pubEncodedAssetAddrWithSignBits`, represents a valid (on-curve), order-l babyjubjub point according to Nocturne's point compression scheme
+//@ensures(7.2) `refundAddrH2CompressedY`, along with its sign bit extracted from `pubEncodedAssetAddrWithSignBits`, represents a valid (on-curve), but not necessarily order-l babyjubjub point according to Nocturne's point compression scheme
 //@ensures(7.3) `refundAddr` is "owned" by same viewing key as the old note owners, as defined by the "ownership check" of the Nocturne Stealth Address scheme.
 //@ensures(8.1) `oldNoteACommitment` is included in the quaternary Poseidon merkle tree whose root is `commitmentTreeRoot`
 //@ensures(8.2) `oldNoteBCommitment` is included in the quaternary Poseidon merkle tree whose root is `commitmentTreeRoot` if `oldNoteBValue` is nonzero
@@ -229,7 +229,7 @@ template JoinSplit() {
     //@lemma(3) oldNoteAOwnerH1 is order-l
     //@argument (6.1) satisfies IsOrderL.requires(1), and IsOrderL.ensures(1) ensures that H1 is of order-l
     //@satisfies(6.3)
-    //@argument H1 is of order-l due to @lemma(3), and H2 is order-l due to @lemma(5) below
+    //@argument H1 is of order-l due to @lemma(3) and it's on the curve due to (6.1)
     BabyCheck()(oldNoteAOwnerH1X, oldNoteAOwnerH1Y);
     BabyCheck()(oldNoteAOwnerH2X, oldNoteAOwnerH2Y);
     IsOrderL()(oldNoteAOwnerH1X, oldNoteAOwnerH1Y);
@@ -237,26 +237,23 @@ template JoinSplit() {
     // check old note B owner is composed of valid babyjubjub points
     //@satisfies(6.2)
     //@argument same as (6.1),
-    //@lemma(4) oldNoteBOwnerH2 is order-l
+    //@lemma(4) oldNoteBOwnerH1 is order-l
     //@argument same as @lemma(3)
     //@satisfies(6.4)
-    //@argument same as (6.3), but with @lemma(4) and @lemma(6) instead of @lemma(3) and @lemma(5)
+    //@argument H1 is of order-l due to @lemma(4) and it's on the curve due to (6.2)
     BabyCheck()(oldNoteBOwnerH1X, oldNoteBOwnerH1Y);
     BabyCheck()(oldNoteBOwnerH2X, oldNoteBOwnerH2Y);
     IsOrderL()(oldNoteBOwnerH1X, oldNoteBOwnerH1Y);
 
     // check that old note owner addresses correspond to user's viewing key 
-    //@lemma(5) oldNoteAOwnerH2 is order-l
-    //@argument (6.1) satisfies StealthAddrOwnership.requires(1), and StealthAddrOwnership.ensures(1) ensures that H2 is of order-l
     //@satisfies(6.5)
-    //@argument StealthAddrOwnership.requires(1) is satisfied by (6.1) and @lemma(4), and StealthAddrOwnership.requires(2) is satisfied by (6.1)
-    //   therefore, by StealthAddrOwnership.ensures(1), old note A owner is "owned" by the viewing key according to the Nocturne Stealth Address scheme
+    //@argument StealthAddrOwnership.requires(1) is satisfied by (6.1) and @lemma(3), and StealthAddrOwnership.requires(2) is satisfied by (6.1)
+    //   therefore, by StealthAddrOwnership.ensures(1, 2), old note A owner is "owned" by the viewing key according to the Nocturne Stealth Address scheme
     StealthAddrOwnership()(oldNoteAOwnerH1X, oldNoteAOwnerH1Y, oldNoteAOwnerH2X, oldNoteAOwnerH2Y, vkBits);
 
-    //@lemma(6) oldNoteBOwnerH2 is order-l
-    //@argument same as @lemma(5)
     //@satisfies(6.6)
-    //@argument same as (6.5), but with @lemma(6) instead of @lemma(5)
+    //@argument StealthAddrOwnership.requires(1) is satisfied by (6.2) and @lemma(4), and StealthAddrOwnership.requires(2) is satisfied by (6.1)
+    //   therefore, by StealthAddrOwnership.ensures(1, 2), old note A owner is "owned" by the viewing key according to the Nocturne Stealth Address scheme
     StealthAddrOwnership()(oldNoteBOwnerH1X, oldNoteBOwnerH1Y, oldNoteBOwnerH2X, oldNoteBOwnerH2Y, vkBits);
 
     // check that the sum of old and new note values are in range [0, 2**252)
@@ -294,16 +291,12 @@ template JoinSplit() {
 
     // get sign bits of refund addr out of pubEncodedAssetAddrWithSignBits
     // don't need Num2Bits_strict here because it's only 253 bits
-    //@lemma(7) `refundAddrH1Sign` is the sign bit of `refundAddrH1CompressedY` as specified in `pubEncodedAssetAddrWithSignBits`
-    //@argument follows from encoding defn and Num2Bits(253), which can't overflow because it's 253 bits 
-    //@lemma(8) `refundAddrH2Sign` is the sign bit of `refundAddrH2CompressedY` as specified in `pubEncodedAssetAddrWithSignBits`
-    //@argument same as @lemma(7) 
     signal pubEncodedAssetAddrWithSignBitsBits[253] <== Num2Bits(253)(pubEncodedAssetAddrWithSignBits);
     signal refundAddrH1Sign <== pubEncodedAssetAddrWithSignBitsBits[248];
     signal refundAddrH2Sign <== pubEncodedAssetAddrWithSignBitsBits[249];
 
     // get encodedAssetAddr out of pubEncodedAssetAddrWithSignBits
-    //@lemma(9) `encodedAssetAddrDecoded` is what one would get if they masked the refund addr sign bits in `pubEncodedAssetAddrWithSignBits` to zero
+    //@lemma(5) `encodedAssetAddrDecoded` is what one would get if they masked the refund addr sign bits in `pubEncodedAssetAddrWithSignBits` to zero
     //@argument: encoding is correct due to @requires(3)
     // 1. `pubEncodedAssetAddrWithSignBitsBits` is the correct, unique 253-bit little-endian bit decomposition of `pubEncodedAssetAddrWithSignBits`
     //    Num2Bits(253) guarantees this because a 253-bit decomp cannot overflow the field
@@ -328,9 +321,10 @@ template JoinSplit() {
     //@satisfies(2.1)
     //@argument if publicSpend is nonzero, `1 - publicSpendisZero == 1`, so this constraint is satisfied IFF `encodedAssetAddr == encodedAssetAddrDecoded`
     // (2.1) follows from here by noting that we use `encodedAssetAddr` when computing the note commitments below
+    // and that `encodedAssetAddrDecoded` is `pubEncodedAssetAddrWithSignBits` with the sign bits masked to zero (@lemma(5)).
     //@satisfies (2.2)
     //@argument if publicSpend is zero, `1 - publicSpendIsZero == 0`, so this constraint is satisfied IFF `encodedAssetAddrDecoded == 0`.
-    // since `encodedAssetAddrDecoded` is `pubEncodedAssetAddrWithSignBits` with the sign bits masked to zero. this is equivalent (2.2)
+    // since `encodedAssetAddrDecoded` is `pubEncodedAssetAddrWithSignBits` with the sign bits masked to zero (@lemma(5)) => (2.2)
     encodedAssetAddrDecoded === (1 - publicSpendIsZero) * encodedAssetAddr;
 
     // compute oldNoteACommitment
@@ -428,10 +422,10 @@ template JoinSplit() {
     );
 
     // check refund addr is valid and derived from same VK to prevent transfers via refunds
-    //@lemma(10) `(refundAddrH1X, refundAddrH1Y)` is a valid, order-l Baby Jubjub point
+    //@lemma(6) `(refundAddrH1X, refundAddrH1Y)` is a valid, order-l Baby Jubjub point
     //@argument BabyCheck ensures it's on-curve, IsOrderL ensures it's order-l
-    //@lemma(11) `(refundAddrH1X, refundAddrH1Y)` is a valid, order-l Baby Jubjub point
-    //@argument same as @lemma(10)
+    //@lemma(7) `(refundAddrH2X, refundAddrH2Y)` is a valid, but not necessarily order-l Baby Jubjub point
+    //@argument same as @lemma(6)
     BabyCheck()(refundAddrH1X, refundAddrH1Y);
     BabyCheck()(refundAddrH2X, refundAddrH2Y);
     IsOrderL()(refundAddrH1X, refundAddrH1Y);
@@ -440,8 +434,8 @@ template JoinSplit() {
     // connect the y cordinates to the output signals
     // and assert that the sign bits match what was given in `pubEncodedAssetAddrWithSignBits`
     //@satisfies(7.1)
-    //@argument CompressPoint.requires(1) is satisfied due to @lemma(10), and together with @lemma(10), 
-    //   CompressPoint.ensures(1) satisfies (7.1)
+    //@argument CompressPoint.requires(1) is satisfied due to @lemma(6), 
+    //   and CompressPoint.ensures(1) satisfies (7.1)
     component compressors[2];
     compressors[0] = CompressPoint();
     compressors[0].in[0] <== refundAddrH1X;
@@ -450,7 +444,7 @@ template JoinSplit() {
     refundAddrH1Sign === compressors[0].sign;
 
     //@satisfies(7.2)
-    //@argument same as (7.1)
+    //@argument same as (7.1), but without the requirement that the point is order-l and using @lemma(7) instead of @lemma(6)
     compressors[1] = CompressPoint();
     compressors[1].in[0] <== refundAddrH2X;
     compressors[1].in[1] <== refundAddrH2Y;
@@ -472,13 +466,12 @@ template JoinSplit() {
     var SENDER_COMMITMENT_DOMAIN_SEPARATOR = 5680996188676417870015190585682285899130949254168256752199352013418366665222;
     senderCommitment <== PoseidonWithDomainSeparator(3, SENDER_COMMITMENT_DOMAIN_SEPARATOR)([senderCanonAddr[0], senderCanonAddr[1], newNoteBNonce]);
 
-    // compress sender and receiver
     //@satisfies(14)
     //@argument
     // 1. `compressedSenderCanonAddrY`, `senderSignBit` is correct decomposition of `senderCanonAddr` due to @lemma(2) and `CompressPoint.ensures(1)`
     //    and `CompressPoint.requires(1)` is guaranteed by `CanonAddr` derivation above
-    // 2. `compressedReceiverCanonAddrY`, `receiverSignBit` is correct decomposition of `receiverCanonAddr` due to @lemma(13) and `CompressPoint.ensures(1)`
-    // 3. `oldNoteMerkleIndicesWithSignBits` is encoded correctly by construction due to @lemma(12) and @lemma(13)
+    // 2. `compressedReceiverCanonAddrY`, `receiverSignBit` is correct decomposition of `receiverCanonAddr` due to @lemma(9) and `CompressPoint.ensures(1)`
+    // 3. `oldNoteMerkleIndicesWithSignBits` is encoded correctly by construction due to @lemma(8) and @lemma(9)
     // 4. `joinSplitInfoNonce` is computed correctly by construction
     // 5. `joinSplitInfoCommitment` is computed correctly by construction given the above
     // therefore (14) holds 
@@ -495,14 +488,14 @@ template JoinSplit() {
     signal compressedReceiverCanonAddrY <== canonAddrCompressors[1].y;
     signal receiverSignBit <== canonAddrCompressors[1].sign;
 
-    //@lemma(12) oldNoteAIndex is the 32-bit index of the leaf in the tree that corresponds to pathA
+    //@lemma(8) oldNoteAIndex is the 32-bit index of the leaf in the tree that corresponds to pathA
     //@argument `MerkleInclusionProof.ensures(2)` guarantees that each element of `pathA` is a 2-bit number.
     // Therefore `TwoBitLimbsTonNum.requires(1)` is satisfied. The merkle index of a path in a merkle tree is equivalent to the base-b sum
     // of the path indices from leaf to root, so `TwoBitLimbsToNum.ensures(1)` guarantees that `oldNoteAIndex` is the correct, 32-bit merkle index
     signal oldNoteAIndex <== TwoBitLimbsToNum(16)(pathA);
 
-    //@lemma(13) oldNoteBIndex is the 32-bit index of the leaf in the tree that corresponds to pathB
-    //@argument same as @lemma(12).
+    //@lemma(9) oldNoteBIndex is the 32-bit index of the leaf in the tree that corresponds to pathB
+    //@argument same as @lemma(8).
     // Note that `MerkleInclusionProof.ensures(2)` is still relevant in the case when oldNoteB is a dummy note
     // because the second `MerkleInclusionProof` still has to be a valid inclusion proof against *some* root,
     // so even if the prover can put in whatever root they want, `pathB` is still checked to consist only of 2-bit numbers
