@@ -37,4 +37,18 @@ if [[ $OSTYPE == 'darwin'* ]]; then
 		GSED_VERSION=$(gsed --version | head -n 1)
 		echo "installed gsed version $GSED_VERSION"
 	fi
+
+	echo "checking if sha256sum is installed..."
+	SHA256SUM_VERSION=$(sha256sum --version | head -n 1)
+	if [ $? -eq 0 ]
+	then
+		echo "found sha256sum version $SHA256SUM_VERSION"
+		echo ""
+	else
+		echo "sha256sum not found. installing..."
+		brew install coreutils
+		source ~/.bashrc
+		SHA256SUM_VERSION=$(sha256sum --version | head -n 1)
+		echo "installed sha256sum version $SHA256SUM_VERSION"
+	fi
 fi

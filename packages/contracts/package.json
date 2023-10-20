@@ -8,7 +8,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "bootstrap": "yarn clean && yarn build",
-    "build": "yarn build:foundry && yarn build:hardhat && cp -r ./poseidon-bytecode ./dist",
+    "build": "yarn build:foundry && yarn build:hardhat && cp -r ./poseidon-bytecode ./dist && ./scripts/shasum.sh",
     "build:foundry": "FOUNDRY_PROFILE=contracts forge build --sizes",
     "build:hardhat": "yarn compile && hardhat prepare-package && tsc --build && yarn copy-definitions",
     "clean": "hardhat clean && rm -rf .turbo artifacts cache_hardhat dist src foundry_artifacts",
