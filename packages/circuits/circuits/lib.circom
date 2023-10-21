@@ -127,9 +127,8 @@ template VKDerivation() {
 // checks that a stealth address belongs to a given vk
 //@requires(1) `H1X` and `H1Y` comprise a valid, order-l Baby Jubjub point (i.e. it's on-curve)
 //@requires(2) `H2X` and `H2Y` comprise a valid, but not necessarily order-l Baby Jubjub point (i.e. it's on-curve)
-//@ensures(1) `H2X` and `H2Y` comprise a order-l Baby Jubjub point (i.e. it's on-curve)
-//@ensures(2) `H1X`, `H1Y`, `H2X`, and `H2Y` comprise a stealth address "owned" by the viewing key represented by `vkBits` according to the stealth address scheme
-//@ensures(3) the viewing key represented by `vkBits` is the only possible viewing key that can "own" the given stealth address based on the DDH assumption
+//@ensures(1) `H1X`, `H1Y`, `H2X`, and `H2Y` comprise a stealth address "owned" by the viewing key represented by `vkBits` according to the stealth address scheme
+//@ensures(2) the viewing key represented by `vkBits` is the only possible viewing key that can "own" the given stealth address based on the DDH assumption
 template StealthAddrOwnership() {
     // X and Y coordinates of both
     // components of the stealth address
