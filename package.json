@@ -7,16 +7,21 @@
     "install-deps": "./scripts/install_deps.sh",
     "copy-fixtures": "cp -r ../monorepo/fixtures .",
     "clean": "yarn workspaces foreach run clean",
-    "build": "yarn turbo run --no-daemon build",
+    "build": "yarn workspaces foreach run build",
     "prettier:write": "yarn workspaces foreach run prettier:write",
     "prettier:check": "yarn workspaces foreach run prettier:check",
-    "lint": "yarn turbo run --no-daemon lint",
+    "lint": "yarn workspaces foreach run lint",
     "lint:fix": "yarn workspaces foreach run lint:fix",
-    "test:unit": "yarn turbo run --no-daemon test:unit",
-    "test:fork": "yarn turbo run --no-daemon test:fork --filter=@nocturne-xyz/contracts",
+    "test:unit": "yarn workspaces foreach run test:unit",
     "publish-packages": "yarn clean && yarn install && yarn build && changeset version && yarn workspaces foreach --no-private --from '@nocturne-xyz/*' npm publish --access public --tolerate-republish && yarn changeset tag"
   },
   "packageManager": "yarn@3.2.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "volta": {
+    "node": "18.12.1"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "hardhat": "^2.18.1",
