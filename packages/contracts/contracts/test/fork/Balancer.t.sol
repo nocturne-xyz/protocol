@@ -47,6 +47,9 @@ contract BalancerTest is ForkBase {
             toInternalBalance: false
         });
 
+        // Whitelist bundler
+        teller.setBundlerPermission(BUNDLER, true);
+
         // Whitelist weth, wsteth, and balancer
         handler.setContractPermission(address(weth), true);
         handler.setContractPermission(address(wsteth), true);

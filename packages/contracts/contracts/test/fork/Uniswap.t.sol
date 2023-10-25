@@ -24,6 +24,9 @@ contract UniswapTest is ForkBase {
     function setUp() public {
         baseSetUp();
 
+        // Whitelist bundler
+        teller.setBundlerPermission(BUNDLER, true);
+
         // Whitelist weth, wsteth, wsteth adapter, and uniswap
         handler.setContractPermission(address(weth), true);
         handler.setContractPermission(address(wsteth), true);

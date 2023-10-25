@@ -76,7 +76,8 @@ contract OperationEIP712Test is Test {
             executionGasLimit: 1,
             gasPrice: 1,
             deadline: 1,
-            atomicActions: true
+            atomicActions: true,
+            isForcedExit: false
         });
 
         bytes32 trackedAssetHash = tellerBase.hashTrackedAsset(
@@ -141,7 +142,7 @@ contract OperationEIP712Test is Test {
         assertEq(
             operationHash,
             bytes32(
-                0xae90b3b9c7b0ad754addcd4c816c7afde5fab49dc0697fec6b800359c545a184
+                0xe1e911282bee044a9c0ef81ef616771fb2bfe8c22360f71e6ab278a4ef6870b2
             )
         );
 
@@ -173,7 +174,7 @@ contract OperationEIP712Test is Test {
         assertEq(
             operationDigest,
             uint256(
-                0x5895882da277ba3b136eb8fade433ad3f07be081a24b1e34532930d7c3b9231
+                0x15756f037f97a6680b74ff9a15c8660990ef00e732b601b00498fdf7e1ebafab
             )
         );
     }

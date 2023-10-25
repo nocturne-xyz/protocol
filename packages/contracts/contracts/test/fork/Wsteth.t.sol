@@ -23,6 +23,9 @@ contract WstethTest is ForkBase {
     function setUp() public {
         baseSetUp();
 
+        // Whitelist bundler
+        teller.setBundlerPermission(BUNDLER, true);
+
         wstethAdapter = new WstethAdapter(address(weth), address(wsteth));
 
         // Whitelist weth, wsteth, wsteth adapter
