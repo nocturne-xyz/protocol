@@ -3161,5 +3161,41 @@ contract TellerAndHandlerTest is Test, PoseidonDeployer {
         teller.processBundle(bundle);
     }
 
+    function testOpWithNoJoinSplits() public {
+        // Alice starts with 1 notes worth of tokens in teller
+        SimpleERC20Token token = ERC20s[0];
+        reserveAndDepositFunds(ALICE, token, PER_NOTE_AMOUNT);
+
+        TrackedAsset[] memory trackedRefundAssets = new TrackedAsset[](0);
+
+        Bundle memory bundle = Bundle({operations: new Operation[](1)});
+        bundle.operations[0] = NocturneUtils.formatOperation(
+            FormatOperationArgs({
+                joinSplitTokens: new address[](0), // no joinsplits
+                joinSplitRefundValues: new uint256[](0), // no joinsplits
+                gasToken: address(token),
+                root: handler.root(),
+                joinSplitsPublicSpends: new uint256[][](0), // no joinsplits
+                trackedRefundAssets: trackedRefundAssets,
+                gasAssetRefundThreshold: 0,
+                executionGasLimit: DEFAULT_GAS_LIMIT,
+                gasPrice: 0,
+                actions: NocturneUtils.formatSingleTransferActionArray(
+                    address(token),
+                    ALICE, // transfer all to self
+                    PER_NOTE_AMOUNT
+                ),
+                atomicActions: false,
+                operationFailureType: OperationFailureType.NONE
+            })
+        );
+
+        // expect revert
+        vm.expectRevert("!JoinSplits");
+
+        vm.prank(BUNDLER, BUNDLER);
+        teller.processBundle(bundle);
+    }
+
     // TODO: add testcase for leftover tokens in handler sent to leftover holder
 }
