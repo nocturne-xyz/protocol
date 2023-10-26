@@ -35,6 +35,9 @@ contract RethTest is ForkBase {
 
         rethAdapter = new RethAdapter(address(weth), address(rocketStorage));
 
+        // Whitelist bundler
+        teller.setBundlerPermission(BUNDLER, true);
+
         // Whitelist weth, reth, reth adapter
         handler.setContractPermission(address(weth), true);
         handler.setContractPermission(address(reth), true);

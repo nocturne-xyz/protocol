@@ -14,7 +14,15 @@ library Validation {
     uint256 constant CURVE_D = 168696;
     uint256 constant COMPRESSED_POINT_Y_MASK = ~uint256(1 << 254);
 
-    function validateOperation(Operation calldata op) internal view {
+    function validateOperation(
+        Operation calldata op,
+        OperationType expectedOpType
+    ) internal view {
+        require(
+            op.isForcedExit == (expectedOpType == OperationType.ForcedExit),
+            "!op type"
+        );
+
         // Ensure public spend > 0 for public joinsplit. Ensures handler only deals
         // with assets that are actually unwrappable. If asset has > 0 public spend, then
         // circuit guarantees that note with the _revealed_ asset is included in the tree is

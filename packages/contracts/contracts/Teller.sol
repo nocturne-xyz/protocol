@@ -46,6 +46,9 @@ contract Teller is
     // Set of contracts which can deposit funds into Teller
     mapping(address => bool) public _depositSources;
 
+    // Set of allowed bundlers
+    mapping(address => bool) public _bundlers;
+
     // 6 elem poseidon hasher
     IPoseidonExtT7 public _poseidonExtT7;
 
@@ -54,6 +57,9 @@ contract Teller is
 
     /// @notice Event emitted when a deposit source is given/revoked permission
     event DepositSourcePermissionSet(address source, bool permission);
+
+    /// @notice Event emitted when a bundler is given/revoked permission
+    event BundlerPermissionSet(address bundler, bool permission);
 
     /// @notice Event emitted when an operation is processed/executed (one per operation)
     event OperationProcessed(
@@ -66,6 +72,9 @@ contract Teller is
         uint128 preOpMerkleCount,
         uint128 postOpMerkleCount
     );
+
+    /// @notice Event emitted when a forced exit is processed
+    event ForcedExit(uint256[] opDigests, JoinSplitInfo[][] joinSplitInfos);
 
     /// @notice Initializer function
     /// @param handler Address of the handler contract
@@ -98,9 +107,9 @@ contract Teller is
         _;
     }
 
-    /// @notice Only callable by EOA
-    modifier onlyEoa() {
-        require(tx.origin == msg.sender, "Only eoa");
+    /// @notice Only callable by allowed bundler
+    modifier onlyAllowedBundler() {
+        require(_bundlers[msg.sender], "Only bundler");
         _;
     }
 
@@ -123,6 +132,17 @@ contract Teller is
     ) external onlyOwner {
         _depositSources[source] = permission;
         emit DepositSourcePermissionSet(source, permission);
+    }
+
+    /// @notice Sets permission for a bundler
+    /// @param bundler Address of the bundler
+    /// @param permission Whether or not the bundler is allowed to process bundles
+    function setBundlerPermission(
+        address bundler,
+        bool permission
+    ) external onlyOwner {
+        _bundlers[bundler] = permission;
+        emit BundlerPermissionSet(bundler, permission);
     }
 
     /// @notice Deposits funds into the Teller contract and calls on handler to add new notes
@@ -160,7 +180,6 @@ contract Teller is
     ///         per op.
     /// @dev Restricts caller of entrypoint to EOA to ensure processBundle cannot be atomically
     ///      called with another transaction.
-    /// @param bundle Bundle of operations to process
     function processBundle(
         Bundle calldata bundle
     )
@@ -168,7 +187,87 @@ contract Teller is
         override
         whenNotPaused
         nonReentrant
-        onlyEoa
+        onlyAllowedBundler
+        returns (uint256[] memory opDigests, OperationResult[] memory opResults)
+    {
+        return _processBundle(bundle, OperationType.Standard);
+    }
+
+    /// @notice Allows user to submit a bundle of operations given they open the commitment to
+    ///         joinsplit info. This ensures users are always able to exit the protocol even if the
+    ///         the bundler goes down or rejects an operation.
+    /// @dev Opens joinsplit info commitment and ensures joinsplit info matches the commitment.
+    ///      Also ensures there are no conf joinsplits and that pub joinsplits have output notes of
+    ///      value 0, making sure there is no value being created in new notes.
+    /// @dev Passes the ForcedExit operation type to the Handler, which signals to
+    ///      the Handler to NOT create new output notes and NOT create refund notes. This is to
+    ///      ensure funds can only flow out of the protocol for forcedExit and no new outputs can
+    ///      be created.
+    /// @param bundle Bundle of operations to process
+    /// @param joinSplitInfos Array of joinSplitInfos for each public joinSplit in each operation
+    function forcedExit(
+        Bundle calldata bundle,
+        JoinSplitInfo[][] calldata joinSplitInfos
+    ) external whenNotPaused nonReentrant returns (OperationResult[] memory) {
+        // Ensure bundle has ops that can only send funds out of protocol and that user
+        // reveals notes being spent on the way out
+        uint256 numOps = bundle.operations.length;
+        for (uint256 i = 0; i < numOps; i++) {
+            Operation calldata op = bundle.operations[i];
+
+            // No conf joinsplits
+            require(op.confJoinSplits.length == 0, "!conf JS");
+
+            // Exists joinSplitInfo for each public joinSplit
+            uint256 numJoinSplitInfosForOp = joinSplitInfos[i].length;
+            require(
+                op.pubJoinSplits.length == numJoinSplitInfosForOp,
+                "!JS info len"
+            );
+
+            for (uint256 j = 0; j < numJoinSplitInfosForOp; j++) {
+                // No output notes
+                require(joinSplitInfos[i][j].newNoteValueA == 0, "!newValueA");
+                require(joinSplitInfos[i][j].newNoteValueB == 0, "!newValueB");
+
+                // Require joinSplitInfoCommitment to match joinSplitInfo
+                uint256 joinSplitInfoCommmitment = _poseidonExtT7.poseidonExt(
+                    JOINSPLIT_INFO_COMMITMENT_DOMAIN_SEPARATOR,
+                    [
+                        joinSplitInfos[i][j].compressedSenderCanonAddr,
+                        joinSplitInfos[i][j].compressedReceiverCanonAddr,
+                        joinSplitInfos[i][j].oldMerkleIndicesWithSignBits,
+                        joinSplitInfos[i][j].newNoteValueA,
+                        joinSplitInfos[i][j].newNoteValueB,
+                        joinSplitInfos[i][j].nonce
+                    ]
+                );
+                require(
+                    joinSplitInfoCommmitment ==
+                        op.pubJoinSplits[j].joinSplit.joinSplitInfoCommitment,
+                    "!JS info"
+                );
+            }
+        }
+
+        (
+            uint256[] memory opDigests,
+            OperationResult[] memory opResults
+        ) = _processBundle(bundle, OperationType.ForcedExit);
+        emit ForcedExit(opDigests, joinSplitInfos);
+
+        return opResults;
+    }
+
+    /// @notice Processes a bundle of operations. Verifies all proofs, then loops through each op
+    ///         and passes to Handler for processing/execution. Emits one OperationProcessed event
+    ///         per op.
+    /// @param bundle Bundle of operations to process
+    function _processBundle(
+        Bundle calldata bundle,
+        OperationType opType
+    )
+        internal
         returns (uint256[] memory opDigests, OperationResult[] memory opResults)
     {
         Operation[] calldata ops = bundle.operations;
@@ -176,7 +275,7 @@ contract Teller is
 
         opDigests = new uint256[](ops.length);
         for (uint256 i = 0; i < ops.length; i++) {
-            Validation.validateOperation(ops[i]);
+            Validation.validateOperation(ops[i], opType);
             opDigests[i] = _computeDigest(ops[i]);
         }
 

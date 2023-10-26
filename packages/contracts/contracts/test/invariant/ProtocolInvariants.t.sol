@@ -51,6 +51,9 @@ contract ProtocolInvariants is Test, InvariantsBase, PoseidonDeployer {
         handler.initialize(address(subtreeUpdateVerifier), address(0x111));
         handler.setTeller(address(teller));
 
+        // Whitelist bundler
+        teller.setBundlerPermission(BUNDLER_ADDRESS, true);
+
         teller.setDepositSourcePermission(address(depositManager), true);
         handler.setSubtreeBatchFillerPermission(address(this), true);
 

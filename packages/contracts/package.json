@@ -30,7 +30,7 @@
     "test:fork:reth": "forge test --fork-block-number 17823595 --match-contract 'RethTest' --fork-url https://eth-mainnet.g.alchemy.com/v2/X21iuJe_hcEAH4cooxG7xGuTQ-ebJJmB",
     "test:gas-report": "yarn test:unit --gas-report",
     "test:invariant-summary": "yarn test:unit -vv -m invariant_callSummary",
-    "test:unit": "forge test --no-match-contract 'WstethTest|UniswapTest|BalancerTest|RethTest'",
+    "test:unit": "forge test --no-match-contract 'WstethTest|UniswapTest|BalancerTest|RethTest' -v",
     "verify:hardhat": "hardhat verify"
   },
   "dependencies": {
