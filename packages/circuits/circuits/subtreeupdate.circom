@@ -290,7 +290,7 @@ template SubtreeUpdate(r, s) {
     // note that we decode in LE order here - this is because `BitsToTwoBitLimbs` assumes LE.
     // this is equivalent to the BE way of describing it in the spec
     //@lemma(2) there exists a valid membership proof of an empty depth-s subtree at the location encoded by `encodedPathAndHash` in the tree with root `oldRoot`
-    //@argument `pathAndHashBits` is the unique, little-endian bit decomp of `encodedPathAndHash` because @requires(1) gaurantees `Num2Bits` to be safe.
+    //@argument `pathAndHashBits` is the unique, little-endian bit decomp of `encodedPathAndHash` because @requires(1) guarantees `Num2Bits` to be safe.
     // => `pathBits` contains the 2*r path bits due to SliceFirstK.ensures(1) since SliceFirstK.requires(1) is satisfied by @requires(3).
     // => `pathIndices` contains pathIndices for path from empty subtree root the commitment tree root since BitsToTwoBitLimbs.ensures(1) matches encoding guaranteed by @requires(1)
     //     and BitsToTwoBitLimbs.requires(1) is guaranteed by @requires(3)

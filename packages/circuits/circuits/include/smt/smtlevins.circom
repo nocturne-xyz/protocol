@@ -78,7 +78,7 @@ template SMTLevIns(nLevels) {
     signal input enabled;
     signal input siblings[nLevels];
     signal output levIns[nLevels];
-    signal done[nLevels-1];        // Indicates if the insLevel has aready been detected.
+    signal done[nLevels-1];        // Indicates if the insLevel has already been detected.
 
     var i;
 

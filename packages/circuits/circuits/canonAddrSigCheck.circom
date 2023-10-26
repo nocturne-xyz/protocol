@@ -28,7 +28,7 @@ template CanonAddrSigCheck() {
 	SigVerify()(spendPubkey, msg, sig);
 
 	//@satisfies(2)
-	//@argument `VKDerivation.requires(1)` is guranteed by checks above.
+	//@argument `VKDerivation.requires(1)` is guaranteed by checks above.
 	// `VKDerivation.ensures(3, 1)` => vkBits is the LE repr of the correct VK derived from spendPubkey and vkNonce
 	// => `CanonAddr.requires(1)` is satisfied. Then, (2) follows from `CanonAddr.ensures(2)`, `@lemma(1)`, and compression checks below
 	//@satisfies(1) follows from (2) and `CanonAddr.ensures(1)`
