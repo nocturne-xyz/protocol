@@ -7,11 +7,11 @@ import {ForkBase} from "./ForkBase.sol";
 import {IWeth} from "../../interfaces/IWeth.sol";
 import {IWsteth} from "../../interfaces/IWsteth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ISwapRouter} from "../../interfaces/ISwapRouter.sol";
 import {UniswapV3Adapter} from "../../adapters/UniswapV3Adapter.sol";
 import "../../libs/Types.sol";
 import "../../libs/AssetUtils.sol";
 import "../utils/NocturneUtils.sol";
-import "../interfaces/IUniswapV3.sol";
 
 contract UniswapTest is ForkBase {
     IWeth public constant weth =
@@ -19,8 +19,8 @@ contract UniswapTest is ForkBase {
     IWsteth public constant wsteth =
         IWsteth(0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0);
 
-    IUniswapV3 public constant uniswap =
-        IUniswapV3(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+    ISwapRouter public constant uniswap =
+        ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
     UniswapV3Adapter uniswapAdapter;
 
