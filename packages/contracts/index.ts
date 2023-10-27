@@ -26,6 +26,7 @@ export type { RethAdapter } from './src/RethAdapter';
 export type { EthTransferAdapter } from './src/EthTransferAdapter';
 export type { UniswapV3Adapter } from './src/UniswapV3Adapter';
 export type { IBalancer } from './src/IBalancer';
+export type { ISwapRouter } from './src/ISwapRouter';
 
 export type { SimpleERC20Token } from './src/SimpleERC20Token';
 export type { SimpleERC721Token } from './src/SimpleERC721Token';
@@ -54,6 +55,7 @@ export { EthTransferAdapter__factory } from './src/factories/EthTransferAdapter_
 export { UniswapV3Adapter__factory } from './src/factories/UniswapV3Adapter__factory';
 
 export { IBalancer__factory } from './src/factories/IBalancer__factory';
+export { ISwapRouter__factory } from './src/factories/ISwapRouter__factory';
 
 export { TransparentUpgradeableProxy__factory } from './src/factories/TransparentUpgradeableProxy__factory';
 export { ProxyAdmin__factory } from './src/factories/ProxyAdmin__factory';

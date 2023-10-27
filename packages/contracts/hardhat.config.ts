@@ -109,6 +109,7 @@ module.exports = {
       'SimpleERC1155Token',
       'WETH9',
       'IBalancer',
+      'ISwapRouter',
       'TestSubtreeUpdateVerifier',
       'TransparentUpgradeableProxy',
       'ProxyAdmin',
