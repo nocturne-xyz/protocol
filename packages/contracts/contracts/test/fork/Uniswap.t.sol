@@ -32,9 +32,6 @@ contract UniswapTest is ForkBase {
         uniswapAdapter.setTokenPermission(address(weth), true);
         uniswapAdapter.setTokenPermission(address(wsteth), true);
 
-        // Whitelist bundler
-        teller.setBundlerPermission(BUNDLER, true);
-
         // Whitelist weth, wsteth, wsteth adapter, and uniswap
         handler.setContractPermission(address(weth), true);
         handler.setContractPermission(address(wsteth), true);
