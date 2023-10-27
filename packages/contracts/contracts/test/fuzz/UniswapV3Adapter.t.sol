@@ -14,17 +14,32 @@ contract UniswapV3AdapterTest is Test {
         uniswapAdapter = new TestUniswapV3Adapter(dummySwapRouter);
     }
 
-    function generateRandomPath(uint256 seed, uint256 minNumHops) internal returns(bytes memory path, address[] memory tokens, uint24[] memory fees) {
+    function generateRandomPath(
+        uint256 seed,
+        uint256 minNumHops
+    )
+        internal
+        view
+        returns (
+            bytes memory path,
+            address[] memory tokens,
+            uint24[] memory fees
+        )
+    {
         uint256 numHops = bound(seed, minNumHops, 9);
 
         tokens = new address[](numHops + 1);
         fees = new uint24[](numHops);
         for (uint256 i = 0; i < numHops; i++) {
-            tokens[i] = address(uint160(uint256(keccak256(abi.encodePacked(seed, i)))));
+            tokens[i] = address(
+                uint160(uint256(keccak256(abi.encodePacked(seed, i))))
+            );
             fees[i] = uint24(uint256(keccak256(abi.encodePacked(seed, i + 1))));
 
             if (i + 1 == numHops) {
-                tokens[i + 1] = address(uint160(uint256(keccak256(abi.encodePacked(seed, i + 1)))));
+                tokens[i + 1] = address(
+                    uint160(uint256(keccak256(abi.encodePacked(seed, i + 1))))
+                );
             }
         }
 
@@ -34,43 +49,51 @@ contract UniswapV3AdapterTest is Test {
                 break;
             }
 
-            path = abi.encodePacked(path, tokens[i], fees[i]); 
+            path = abi.encodePacked(path, tokens[i], fees[i]);
         }
     }
 
     function testFuzz_ArbitraryTokenPathExtraction(uint256 seed) public {
-        (bytes memory path, address[] memory tokens, uint24[] memory fees) = generateRandomPath(seed, 1);
+        (
+            bytes memory path,
+            address[] memory tokens,
+            uint24[] memory fees
+        ) = generateRandomPath(seed, 1);
         uint256 numHops = fees.length;
 
         for (uint256 i = 0; i < numHops; i++) {
-            address extractedToken = uniswapAdapter.testExtractTokenAddressFromPath(path, i * 23);
+            address extractedToken = uniswapAdapter
+                .testExtractTokenAddressFromPath(path, i * 23);
             assertEq(extractedToken, tokens[i]);
         }
     }
 
     function testFuzz_TokensInWhitelist(uint256 seed) public {
-        (bytes memory path, address[] memory tokens,) = generateRandomPath(seed, 1);
+        (bytes memory path, address[] memory tokens, ) = generateRandomPath(
+            seed,
+            1
+        );
 
         for (uint256 i = 0; i < tokens.length; i++) {
-            uniswapAdapter.addToWhitelist(tokens[i]);
+            uniswapAdapter.setTokenPermission(tokens[i], true);
         }
 
-        bool isInWhitelist = uniswapAdapter.tokensAreAllowed(
-            path
-        );
+        bool isInWhitelist = uniswapAdapter.testTokensAreAllowed(path);
         assertTrue(isInWhitelist);
     }
 
     function testFuzz_TokensNotInWhitelist(uint256 seed) public {
-        (bytes memory path, address[] memory tokens, uint24[] memory fees) = generateRandomPath(seed, 2);
+        (
+            bytes memory path,
+            address[] memory tokens,
+            uint24[] memory fees
+        ) = generateRandomPath(seed, 2);
 
         uint256 tokenToWhitelistIndex = bound(seed, 0, fees.length);
 
-        uniswapAdapter.addToWhitelist(tokens[tokenToWhitelistIndex]);
+        uniswapAdapter.setTokenPermission(tokens[tokenToWhitelistIndex], true);
 
-        bool isInWhitelist = uniswapAdapter.tokensAreAllowed(
-            path
-        );
+        bool isInWhitelist = uniswapAdapter.testTokensAreAllowed(path);
         assertFalse(isInWhitelist, "Token should not be in whitelist");
     }
 }
