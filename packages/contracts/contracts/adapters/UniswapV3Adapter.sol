@@ -12,8 +12,8 @@ import {ISwapRouter} from "../interfaces/ISwapRouter.sol";
 ///         deposit limits, we needed some calldata validation. This contract validates the tokenIn
 ///         of a single swap and path of a multi-hop swap to ensure no custom-deployed tokens are
 ///         used.
-/// @dev    This contract is Ownable and non-upgradeable. The only power the owner has is adding
-///         and removing tokens from the whitelist.
+/// @dev This contract is Ownable and non-upgradeable. The only power the owner has is adding
+///      and removing tokens from the whitelist.
 contract UniswapV3Adapter is Ownable {
     // UniswapV3 SwapRouter
     ISwapRouter public immutable _swapRouter;
