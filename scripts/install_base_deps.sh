@@ -40,13 +40,14 @@ if [[ $OSTYPE == 'darwin'* ]]; then
 
 	echo "checking if sha256sum is installed..."
 	SHA256SUM_VERSION=$(sha256sum --version | head -n 1)
-	if [ $? -eq 0 ]
+	if [ -n "$SHA256SUM_VERSION" ]
 	then
 		echo "found sha256sum version $SHA256SUM_VERSION"
 		echo ""
 	else
 		echo "sha256sum not found. installing..."
 		brew install coreutils
+		echo 'source /usr/local/opt/coreutils/libexec/gnubin' >> ~/.bashrc
 		source ~/.bashrc
 		SHA256SUM_VERSION=$(sha256sum --version | head -n 1)
 		echo "installed sha256sum version $SHA256SUM_VERSION"
