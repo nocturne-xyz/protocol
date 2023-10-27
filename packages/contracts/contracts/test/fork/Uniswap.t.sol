@@ -7,6 +7,7 @@ import {ForkBase} from "./ForkBase.sol";
 import {IWeth} from "../../interfaces/IWeth.sol";
 import {IWsteth} from "../../interfaces/IWsteth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {UniswapV3Adapter} from "../../adapters/UniswapV3Adapter.sol";
 import "../../libs/Types.sol";
 import "../../libs/AssetUtils.sol";
 import "../utils/NocturneUtils.sol";
@@ -21,13 +22,23 @@ contract UniswapTest is ForkBase {
     IUniswapV3 public constant uniswap =
         IUniswapV3(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
+    UniswapV3Adapter uniswapAdapter;
+
     function setUp() public {
         baseSetUp();
+
+        // Deploy uniswap adapter
+        uniswapAdapter = new UniswapV3Adapter(address(uniswap));
+        uniswapAdapter.setTokenPermission(address(weth), true);
+        uniswapAdapter.setTokenPermission(address(wsteth), true);
+
+        // Whitelist bundler
+        teller.setBundlerPermission(BUNDLER, true);
 
         // Whitelist weth, wsteth, wsteth adapter, and uniswap
         handler.setContractPermission(address(weth), true);
         handler.setContractPermission(address(wsteth), true);
-        handler.setContractPermission(address(uniswap), true);
+        handler.setContractPermission(address(uniswapAdapter), true);
 
         // Whitelist weth approve, wsteth approve, wsteth adapter deposit, and uniswap input swaps
         handler.setContractMethodPermission(
@@ -41,13 +52,13 @@ contract UniswapTest is ForkBase {
             true
         );
         handler.setContractMethodPermission(
-            address(uniswap),
-            uniswap.exactInputSingle.selector,
+            address(uniswapAdapter),
+            uniswapAdapter.exactInputSingle.selector,
             true
         );
         handler.setContractMethodPermission(
-            address(uniswap),
-            uniswap.exactInput.selector,
+            address(uniswapAdapter),
+            uniswapAdapter.exactInput.selector,
             true
         );
 
@@ -96,14 +107,14 @@ contract UniswapTest is ForkBase {
             contractAddress: address(wsteth),
             encodedFunction: abi.encodeWithSelector(
                 wsteth.approve.selector,
-                address(uniswap),
+                address(uniswapAdapter),
                 wstethInAmount
             )
         });
         actions[1] = Action({
-            contractAddress: address(uniswap),
+            contractAddress: address(uniswapAdapter),
             encodedFunction: abi.encodeWithSelector(
-                uniswap.exactInputSingle.selector,
+                uniswapAdapter.exactInputSingle.selector,
                 exactInputParams
             )
         });
@@ -189,14 +200,14 @@ contract UniswapTest is ForkBase {
             contractAddress: address(wsteth),
             encodedFunction: abi.encodeWithSelector(
                 wsteth.approve.selector,
-                address(uniswap),
+                address(uniswapAdapter),
                 wstethInAmount
             )
         });
         actions[1] = Action({
-            contractAddress: address(uniswap),
+            contractAddress: address(uniswapAdapter),
             encodedFunction: abi.encodeWithSelector(
-                uniswap.exactInput.selector,
+                uniswapAdapter.exactInput.selector,
                 exactInputParams
             )
         });
