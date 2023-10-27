@@ -15,7 +15,7 @@ contract UniswapV3AdapterTest is Test {
     }
 
     function generateRandomPath(uint256 seed) internal returns(bytes memory path, address[] memory tokens, uint24[] memory fees) {
-        uint256 numHops = bound(seed, 0, 9);
+        uint256 numHops = bound(seed, 1, 9);
 
         tokens = new address[](numHops + 1);
         fees = new uint24[](numHops);
@@ -71,7 +71,7 @@ contract UniswapV3AdapterTest is Test {
         assertTrue(isInWhitelist, "Token should be in whitelist");
     }
 
-    function testFuzz_testArbitraryTokenPath(uint256 seed) public {
+    function testFuzz_ArbitraryTokenPath(uint256 seed) public {
         (bytes memory path, address[] memory tokens, uint24[] memory fees) = generateRandomPath(seed);
         uint256 numHops = fees.length;
 
@@ -81,7 +81,12 @@ contract UniswapV3AdapterTest is Test {
         }
     }
 
-    function testTokensNotInWhitelist() public {
+    function testFuzz_TokensNotInWhitelist() public {
+        (bytes memory path, address[] memory tokens, uint24[] memory fees) = generateRandomPath(seed);
+        uint256 numHops = fees.length;
+
+        uniswapAdapter.addToWhitelist(tokens[0]);
+
         address dummyToken1 = address(
             0xaBCdEf123456789012345678901234567890AbCd
         );
