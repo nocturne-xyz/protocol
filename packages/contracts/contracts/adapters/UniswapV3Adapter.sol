@@ -5,6 +5,15 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ISwapRouter} from "../interfaces/ISwapRouter.sol";
 
+/// @title UniswapV3Adapter
+/// @author Nocturne Labs
+/// @notice Adapter contract for interacting with the Uniswap SwapRouter contract. Technically
+///         Nocturne does not need an adapter but for the sake of avoiding attacks that bypass
+///         deposit limits, we needed some calldata validation. This contract validates the tokenIn
+///         of a single swap and path of a multi-hop swap to ensure no custom-deployed tokens are
+///         used.
+/// @dev    This contract is Ownable and non-upgradeable. The only power the owner has is adding
+///         and removing tokens from the whitelist.
 contract UniswapV3Adapter is Ownable {
     // UniswapV3 SwapRouter
     ISwapRouter public immutable _swapRouter;
@@ -12,13 +21,17 @@ contract UniswapV3Adapter is Ownable {
     // Whitelist of tokens that can be used in a path
     mapping(address => bool) private _allowedTokens;
 
+    /// @notice Event emitted when a token is added to the whitelist
     event TokenPermissionSet(address token, bool permission);
 
+    // Constructor, sets uniswap swap router contract
     constructor(address swapRouter) Ownable() {
         _swapRouter = ISwapRouter(swapRouter);
     }
 
-    // Add a token to the whitelist (you can also remove or have other admin functionalities as needed)
+    /// @notice Set token permission in whitelist
+    /// @param token Token address
+    /// @param permission Whether token is allowed
     function setTokenPermission(
         address token,
         bool permission
@@ -27,6 +40,9 @@ contract UniswapV3Adapter is Ownable {
         emit TokenPermissionSet(token, permission);
     }
 
+    /// @notice Proxy for exactInputSingle function of Uniswap SwapRouter. Ensures tokenIn
+    ///         is allowed and recipient is caller.
+    /// @param params ExactInputSingleParams (see ISwapRouter)
     function exactInputSingle(
         ISwapRouter.ExactInputSingleParams memory params
     ) external returns (uint256 amountOut) {
@@ -43,6 +59,9 @@ contract UniswapV3Adapter is Ownable {
         amountOut = _swapRouter.exactInputSingle(params);
     }
 
+    /// @notice Proxy for exactInput function of Uniswap SwapRouter.
+    ///         Ensures all tokens in path are is allowed and recipient is caller.
+    /// @param params ExactInputParams (see ISwapRouter)
     function exactInput(
         ISwapRouter.ExactInputParams memory params
     ) external returns (uint256 amountOut) {
@@ -61,10 +80,14 @@ contract UniswapV3Adapter is Ownable {
         amountOut = _swapRouter.exactInput(params);
     }
 
+    /// @notice Checks that all tokens in path are allowed, returns false if any are not
+    /// @param path Path of tokens
+    /// @dev path is formatted as [address token1][uint24 fee][address token2], thus the length will
+    ///      always be ((20 + 3) * n) + 20 bytes where n is the number of hops
     function tokensAreAllowed(bytes memory path) internal view returns (bool) {
         uint256 length = path.length;
 
-        // Ensure the path length is correct: (20 + 3) * n + 20
+        // Ensure the path length is correct: ((20 + 3) * n) + 20
         require((length - 20) % 23 == 0, "Invalid path length");
 
         uint256 numAddresses = (length - 20) / 23 + 1;
@@ -79,7 +102,9 @@ contract UniswapV3Adapter is Ownable {
         return true;
     }
 
-    // Internal function to extract token address from path using inline assembly
+    /// @notice Extracts token address from path at a given index into the path
+    /// @param path Path of tokens
+    /// @param index Index into path
     function extractTokenAddressFromPath(
         bytes memory path,
         uint256 index
@@ -87,7 +112,7 @@ contract UniswapV3Adapter is Ownable {
         address tokenAddr;
 
         // Load 32 bytes that are at 0 + 32 (length prefix) + index bytes offset
-        // Shift right by 12 bytes to get the token address (those 12 will be spillover to right)
+        // Shift right by 12 bytes to get the token address, which is first 20 bytes
         assembly {
             tokenAddr := shr(96, mload(add(add(path, 0x20), index)))
         }
