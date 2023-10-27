@@ -14,6 +14,30 @@ contract UniswapV3AdapterTest is Test {
         uniswapAdapter = new TestUniswapV3Adapter(dummySwapRouter);
     }
 
+    function generateRandomPath(uint256 seed) internal returns(bytes memory path, address[] memory tokens, uint24[] memory fees) {
+        uint256 numHops = bound(seed, 0, 9);
+
+        tokens = new address[](numHops + 1);
+        fees = new uint24[](numHops);
+        for (uint256 i = 0; i < numHops; i++) {
+            tokens[i] = address(uint160(uint256(keccak256(abi.encodePacked(seed, i)))));
+            fees[i] = uint24(uint256(keccak256(abi.encodePacked(seed, i + 1))));
+
+            if (i + 1 == numHops) {
+                tokens[i + 1] = address(uint160(uint256(keccak256(abi.encodePacked(seed, i + 1)))));
+            }
+        }
+
+        for (uint256 i = 0; i < numHops; i++) {
+            if (i + 1 == numHops) {
+                path = abi.encodePacked(path, tokens[i]);
+                break;
+            }
+
+            path = abi.encodePacked(path, tokens[i], fees[i]); 
+        }
+    }
+
     function testSettingSwapRouter() public {
         assertEq(
             address(uniswapAdapter._swapRouter()),
@@ -48,28 +72,8 @@ contract UniswapV3AdapterTest is Test {
     }
 
     function testFuzz_testArbitraryTokenPath(uint256 seed) public {
-        uint256 numHops = bound(seed, 0, 9);
-
-        address[] memory tokens = new address[](numHops + 1);
-        uint24[] memory fees = new uint24[](numHops);
-        for (uint256 i = 0; i < numHops; i++) {
-            tokens[i] = address(uint160(uint256(keccak256(abi.encodePacked(seed, i)))));
-            fees[i] = uint24(uint256(keccak256(abi.encodePacked(seed, i + 1))));
-
-            if (i + 1 == numHops) {
-                tokens[i + 1] = address(uint160(uint256(keccak256(abi.encodePacked(seed, i + 1)))));
-            }
-        }
-
-        bytes memory path;
-        for (uint256 i = 0; i < numHops; i++) {
-            if (i + 1 == numHops) {
-                path = abi.encodePacked(path, tokens[i]);
-                break;
-            }
-
-            path = abi.encodePacked(path, tokens[i], fees[i]); 
-        }
+        (bytes memory path, address[] memory tokens, uint24[] memory fees) = generateRandomPath(seed);
+        uint256 numHops = fees.length;
 
         for (uint256 i = 0; i < numHops; i++) {
             address extractedToken = uniswapAdapter.testExtractTokenAddressFromPath(path, i * 23);
