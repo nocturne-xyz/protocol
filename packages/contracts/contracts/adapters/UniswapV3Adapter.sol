@@ -7,7 +7,7 @@ import {ISwapRouter} from "../interfaces/ISwapRouter.sol";
 contract UniswapV3Adapter is Ownable {
     // UniswapV3 SwapRouter
     ISwapRouter public immutable _swapRouter;
-    
+
     // Whitelist of tokens that can be used in a path
     mapping(address => bool) private _allowedTokens;
 
@@ -21,26 +21,37 @@ contract UniswapV3Adapter is Ownable {
         _allowedTokens[token] = true;
     }
 
-    // Function to check if all token addresses in a path are whitelisted
-    function tokensAreInWhitelist(bytes memory path) public view returns (bool) {
-        uint256 pathLength = path.length;
-        require(pathLength % 23 == 0, "Invalid path length"); // Each (address-fee) pair is 23 bytes: 20 bytes for address and 3 bytes for fee
+    function tokensAreAllowed(bytes memory path) public view returns (bool) {
+        uint256 length = path.length;
 
-        for (uint256 i = 0; i < pathLength; i += 23) {
-            address tokenAddr = getTokenAddressFromPath(path, i);
-            if (!_allowedTokens[tokenAddr]) {
+        // Ensure the path length is correct: (20 + 3) * n + 20
+        require((length - 20) % 23 == 0, "Invalid path length");
+
+        uint256 numAddresses = (length - 20) / 23 + 1;
+
+        for (uint256 i = 0; i < numAddresses; i++) {
+            address tokenAddress = extractTokenAddressFromPath(path, i * 23);
+            if (!_allowedTokens[tokenAddress]) {
                 return false;
             }
         }
+
         return true;
     }
 
     // Internal function to extract token address from path using inline assembly
-    function getTokenAddressFromPath(bytes memory path, uint256 index) internal pure returns (address) {
+    function extractTokenAddressFromPath(
+        bytes memory path,
+        uint256 index
+    ) internal pure returns (address) {
         address tokenAddr;
+        
+        // Load 32 bytes that are at 0 + 32 (length prefix) + index bytes offset
+        // Shift right by 12 bytes to get the token address (those 12 will be spillover to right)
         assembly {
-            tokenAddr := and(mload(add(add(path, 0x20), index)), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+            tokenAddr := shr(96, mload(add(add(path, 0x20), index)))
         }
+
         return tokenAddr;
     }
 }
