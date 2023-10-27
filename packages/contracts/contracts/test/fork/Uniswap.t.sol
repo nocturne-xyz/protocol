@@ -86,8 +86,8 @@ contract UniswapTest is ForkBase {
         });
 
         // Format swap data
-        ISwapRouter.ExactInputSingleParams
-            memory exactInputParams = ISwapRouter.ExactInputSingleParams({
+        ISwapRouter.ExactInputSingleParams memory exactInputParams = ISwapRouter
+            .ExactInputSingleParams({
                 tokenIn: address(wsteth),
                 tokenOut: address(weth),
                 fee: 100,
@@ -179,17 +179,18 @@ contract UniswapTest is ForkBase {
 
         // Format swap data
         // Instructions on formatting inputs: https://docs.uniswap.org/contracts/v3/guides/swaps/multihop-swaps
-        ISwapRouter.ExactInputParams memory exactInputParams = ISwapRouter.ExactInputParams({
-            path: abi.encodePacked(
-                address(wsteth),
-                uint24(100), // 0.01% pool fee
-                address(weth)
-            ),
-            recipient: address(handler),
-            deadline: block.timestamp + 3600,
-            amountIn: wstethInAmount,
-            amountOutMinimum: wethExpectedOutAmount
-        });
+        ISwapRouter.ExactInputParams memory exactInputParams = ISwapRouter
+            .ExactInputParams({
+                path: abi.encodePacked(
+                    address(wsteth),
+                    uint24(100), // 0.01% pool fee
+                    address(weth)
+                ),
+                recipient: address(handler),
+                deadline: block.timestamp + 3600,
+                amountIn: wstethInAmount,
+                amountOutMinimum: wethExpectedOutAmount
+            });
 
         // Format approve and swap call in actions
         Action[] memory actions = new Action[](2);
