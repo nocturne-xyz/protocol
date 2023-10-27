@@ -86,8 +86,8 @@ contract UniswapTest is ForkBase {
         });
 
         // Format swap data
-        ExactInputSingleParams
-            memory exactInputParams = ExactInputSingleParams({
+        ISwapRouter.ExactInputSingleParams
+            memory exactInputParams = ISwapRouter.ExactInputSingleParams({
                 tokenIn: address(wsteth),
                 tokenOut: address(weth),
                 fee: 100,
@@ -179,7 +179,7 @@ contract UniswapTest is ForkBase {
 
         // Format swap data
         // Instructions on formatting inputs: https://docs.uniswap.org/contracts/v3/guides/swaps/multihop-swaps
-        ExactInputParams memory exactInputParams = ExactInputParams({
+        ISwapRouter.ExactInputParams memory exactInputParams = ISwapRouter.ExactInputParams({
             path: abi.encodePacked(
                 address(wsteth),
                 uint24(100), // 0.01% pool fee
