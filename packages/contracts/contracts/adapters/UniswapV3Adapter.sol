@@ -85,16 +85,12 @@ contract UniswapV3Adapter is Ownable {
     /// @dev path is a sequence of hops where a hop is (address token1, uint24 poolFee, address
     ///      token2). Another way to think about it is (address tokenIn) || (uint24 poolFee1,
     ///      token2) || (uint24 poolFee2, token3) || ... || (uint24 poolFeeN, address tokenOut).
-    ///      The length of path will always be `((20 + 3) * N) + 20` bytes
+    ///      The length of path will always be `20 + ((20 + 3) * N)` bytes
     function tokensAreAllowed(bytes memory path) internal view returns (bool) {
-        uint256 length = path.length;
+        // NOTE: function reverts if path is not the correct length 20 + ((20 + 3) * n)
+        uint256 numTokens = mustGetNumTokensInPath(path);
 
-        // Ensure the path length is correct: ((20 + 3) * n) + 20
-        require((length - 20) % 23 == 0, "Invalid path length");
-
-        uint256 numAddresses = (length - 20) / 23 + 1;
-
-        for (uint256 i = 0; i < numAddresses; i++) {
+        for (uint256 i = 0; i < numTokens; i++) {
             address tokenAddress = extractTokenAddressFromPath(path, i);
             if (!_allowedTokens[tokenAddress]) {
                 return false;
@@ -102,6 +98,17 @@ contract UniswapV3Adapter is Ownable {
         }
 
         return true;
+    }
+
+    function mustGetNumTokensInPath(
+        bytes memory path
+    ) internal pure returns (uint256) {
+        uint256 length = path.length;
+
+        // Ensure the path length is correct: ((20 + 3) * n) + 20
+        require((length - 20) % 23 == 0, "Invalid path length");
+
+        return (length - 20) / 23 + 1;
     }
 
     /// @notice Extracts token address from path at a given index into the path
@@ -115,7 +122,10 @@ contract UniswapV3Adapter is Ownable {
         // Shift right by 12 bytes to get the token address, which is first 20 bytes
         address tokenAddr;
         assembly {
-            tokenAddr := shr(96, mload(add(add(path, 0x20), mul(tokenIndex, 0x17))))
+            tokenAddr := shr(
+                96,
+                mload(add(add(path, 0x20), mul(tokenIndex, 0x17)))
+            )
         }
 
         return tokenAddr;
