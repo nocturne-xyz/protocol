@@ -82,10 +82,11 @@ contract UniswapV3Adapter is Ownable {
 
     /// @notice Checks that all tokens in path are allowed, returns false if any are not
     /// @param path Path of tokens
-    /// @dev path is a sequence of hops where a hop is (address token1, uint24 poolFee, address
-    ///      token2). Another way to think about it is (address tokenIn) || (uint24 poolFee1,
-    ///      token2) || (uint24 poolFee2, token3) || ... || (uint24 poolFeeN, address tokenOut).
-    ///      The length of path will always be `20 + ((20 + 3) * N)` bytes
+    /// @dev One Uniswap pool is denoted as (address tokenIn, uint24 poolFee, address tokenOut). 
+    ///      The path param describes which pools are used in the swap. Path is encoded as follows: 
+    ///      `(address tokenIn) || hops`, where `hops` is a sequence of `(uint24 fee, address 
+    ///      tokenOut)` pairs (i.e. for an intermediate hop, the tokenOut of the last hop is the 
+    ///      tokenIn of the next). The length of path will always be `20 + ((20 + 3) * N)` bytes.
     function tokensAreAllowed(bytes memory path) internal view returns (bool) {
         // NOTE: function reverts if path is not the correct length 20 + ((20 + 3) * n)
         uint256 numTokens = mustGetNumTokensInPath(path);
