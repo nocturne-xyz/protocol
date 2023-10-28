@@ -44,26 +44,24 @@ contract UniswapV3AdapterTest is Test {
         }
 
         for (uint256 i = 0; i < numHops; i++) {
+            path = abi.encodePacked(path, tokens[i], fees[i]);
+
             if (i + 1 == numHops) {
-                path = abi.encodePacked(path, tokens[i]);
+                path = abi.encodePacked(path, tokens[i + 1]);
                 break;
             }
-
-            path = abi.encodePacked(path, tokens[i], fees[i]);
         }
     }
 
     function testFuzz_ArbitraryTokenPathExtraction(uint256 seed) public {
-        (
-            bytes memory path,
-            address[] memory tokens,
-            uint24[] memory fees
-        ) = generateRandomPath(seed, 1);
-        uint256 numHops = fees.length;
+        (bytes memory path, address[] memory tokens, ) = generateRandomPath(
+            seed,
+            1
+        );
 
-        for (uint256 i = 0; i < numHops; i++) {
+        for (uint256 i = 0; i < tokens.length; i++) {
             address extractedToken = uniswapAdapter
-                .testExtractTokenAddressFromPath(path, i * 23);
+                .testExtractTokenAddressFromPath(path, i);
             assertEq(extractedToken, tokens[i]);
         }
     }
@@ -91,6 +89,7 @@ contract UniswapV3AdapterTest is Test {
 
         uint256 tokenToWhitelistIndex = bound(seed, 0, fees.length);
 
+        // Whitelist just one token but there's guaranteed to be at least 3 given 2 hops min
         uniswapAdapter.setTokenPermission(tokens[tokenToWhitelistIndex], true);
 
         bool isInWhitelist = uniswapAdapter.testTokensAreAllowed(path);

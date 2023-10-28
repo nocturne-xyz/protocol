@@ -19,7 +19,7 @@ contract UniswapV3Adapter is Ownable {
     ISwapRouter public immutable _swapRouter;
 
     // Whitelist of tokens that can be used in a path
-    mapping(address => bool) private _allowedTokens;
+    mapping(address => bool) public _allowedTokens;
 
     /// @notice Event emitted when a token is added to the whitelist
     event TokenPermissionSet(address token, bool permission);
@@ -82,8 +82,10 @@ contract UniswapV3Adapter is Ownable {
 
     /// @notice Checks that all tokens in path are allowed, returns false if any are not
     /// @param path Path of tokens
-    /// @dev path is formatted as [address token1][uint24 fee][address token2], thus the length will
-    ///      always be ((20 + 3) * n) + 20 bytes where n is the number of hops
+    /// @dev path is a sequence of hops where a hop is (address token1, uint24 poolFee, address
+    ///      token2). Another way to think about it is (address tokenIn) || (uint24 poolFee1,
+    ///      token2) || (uint24 poolFee2, token3) || ... || (uint24 poolFeeN, address tokenOut).
+    ///      The length of path will always be `((20 + 3) * N) + 20` bytes
     function tokensAreAllowed(bytes memory path) internal view returns (bool) {
         uint256 length = path.length;
 
@@ -93,7 +95,7 @@ contract UniswapV3Adapter is Ownable {
         uint256 numAddresses = (length - 20) / 23 + 1;
 
         for (uint256 i = 0; i < numAddresses; i++) {
-            address tokenAddress = extractTokenAddressFromPath(path, i * 23);
+            address tokenAddress = extractTokenAddressFromPath(path, i);
             if (!_allowedTokens[tokenAddress]) {
                 return false;
             }
@@ -104,17 +106,16 @@ contract UniswapV3Adapter is Ownable {
 
     /// @notice Extracts token address from path at a given index into the path
     /// @param path Path of tokens
-    /// @param index Index into path
+    /// @param tokenIndex Index of token in path, 0 for tokenIn, N for tokenOut for N hop path
     function extractTokenAddressFromPath(
         bytes memory path,
-        uint256 index
+        uint256 tokenIndex
     ) internal pure returns (address) {
-        address tokenAddr;
-
-        // Load 32 bytes that are at 0 + 32 (length prefix) + index bytes offset
+        // Load 32 bytes that are at offset 0 + 32 (length prefix) + index * 23 bytes
         // Shift right by 12 bytes to get the token address, which is first 20 bytes
+        address tokenAddr;
         assembly {
-            tokenAddr := shr(96, mload(add(add(path, 0x20), index)))
+            tokenAddr := shr(96, mload(add(add(path, 0x20), mul(tokenIndex, 0x17))))
         }
 
         return tokenAddr;
