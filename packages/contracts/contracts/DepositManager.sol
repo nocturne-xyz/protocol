@@ -85,23 +85,12 @@ contract DepositManager is
     );
 
     /// @notice Event emitted when a deposit is retrieved
-    event DepositRetrieved(
-        address indexed spender,
-        EncodedAsset encodedAsset,
-        uint256 value,
-        CompressedStealthAddress depositAddr,
-        uint256 nonce,
-        uint256 gasCompensation
-    );
+    event DepositRetrieved(bytes32 indexed depositHash);
 
     /// @notice Event emitted when a deposit is completed
     event DepositCompleted(
-        address indexed spender,
-        EncodedAsset encodedAsset,
-        uint256 value,
-        CompressedStealthAddress depositAddr,
-        uint256 nonce,
-        uint256 gasCompensation,
+        bytes32 indexed depositHash,
+        uint256 gasPaid,
         uint128 merkleIndex
     );
 
@@ -400,14 +389,7 @@ contract DepositManager is
             req.gasCompensation + req.value
         );
 
-        emit DepositRetrieved(
-            req.spender,
-            req.encodedAsset,
-            req.value,
-            req.depositAddr,
-            req.nonce,
-            req.gasCompensation
-        );
+        emit DepositRetrieved(depositHash);
     }
 
     /// @notice Retrieves a deposit either prematurely because user cancelled or because screener
@@ -435,14 +417,7 @@ contract DepositManager is
         // Send back eth gas compensation, revert propagated
         AddressUpgradeable.sendValue(payable(msg.sender), req.gasCompensation);
 
-        emit DepositRetrieved(
-            req.spender,
-            req.encodedAsset,
-            req.value,
-            req.depositAddr,
-            req.nonce,
-            req.gasCompensation
-        );
+        emit DepositRetrieved(depositHash);
     }
 
     /// @notice Completes an erc20 deposit.
@@ -518,14 +493,6 @@ contract DepositManager is
             );
         }
 
-        emit DepositCompleted(
-            req.spender,
-            req.encodedAsset,
-            req.value,
-            req.depositAddr,
-            req.nonce,
-            actualGasComp,
-            merkleIndex
-        );
+        emit DepositCompleted(depositHash, actualGasComp, merkleIndex);
     }
 }
