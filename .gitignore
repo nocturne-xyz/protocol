@@ -38,6 +38,7 @@ contract-artifacts
 .setup
 build
 circuit-artifacts/**/*.*
+!circuit-artifacts/**/*.r1cs
 !circuit-artifacts/*/*_js/*.wasm
 !circuit-artifacts/*/*_cpp/*.zkey
 !circuit-artifacts/*/*_cpp/*.json
