@@ -7,10 +7,11 @@ import {ForkBase} from "./ForkBase.sol";
 import {IWeth} from "../../interfaces/IWeth.sol";
 import {IWsteth} from "../../interfaces/IWsteth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ISwapRouter} from "../../interfaces/ISwapRouter.sol";
+import {UniswapV3Adapter} from "../../adapters/UniswapV3Adapter.sol";
 import "../../libs/Types.sol";
 import "../../libs/AssetUtils.sol";
 import "../utils/NocturneUtils.sol";
-import "../interfaces/IUniswapV3.sol";
 
 contract UniswapTest is ForkBase {
     IWeth public constant weth =
@@ -18,16 +19,23 @@ contract UniswapTest is ForkBase {
     IWsteth public constant wsteth =
         IWsteth(0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0);
 
-    IUniswapV3 public constant uniswap =
-        IUniswapV3(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+    ISwapRouter public constant uniswap =
+        ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
+
+    UniswapV3Adapter uniswapAdapter;
 
     function setUp() public {
         baseSetUp();
 
+        // Deploy uniswap adapter
+        uniswapAdapter = new UniswapV3Adapter(address(uniswap));
+        uniswapAdapter.setTokenPermission(address(weth), true);
+        uniswapAdapter.setTokenPermission(address(wsteth), true);
+
         // Whitelist weth, wsteth, wsteth adapter, and uniswap
         handler.setContractPermission(address(weth), true);
         handler.setContractPermission(address(wsteth), true);
-        handler.setContractPermission(address(uniswap), true);
+        handler.setContractPermission(address(uniswapAdapter), true);
 
         // Whitelist weth approve, wsteth approve, wsteth adapter deposit, and uniswap input swaps
         handler.setContractMethodPermission(
@@ -41,13 +49,13 @@ contract UniswapTest is ForkBase {
             true
         );
         handler.setContractMethodPermission(
-            address(uniswap),
-            uniswap.exactInputSingle.selector,
+            address(uniswapAdapter),
+            uniswapAdapter.exactInputSingle.selector,
             true
         );
         handler.setContractMethodPermission(
-            address(uniswap),
-            uniswap.exactInput.selector,
+            address(uniswapAdapter),
+            uniswapAdapter.exactInput.selector,
             true
         );
 
@@ -78,8 +86,8 @@ contract UniswapTest is ForkBase {
         });
 
         // Format swap data
-        ExactInputSingleParams
-            memory exactInputParams = ExactInputSingleParams({
+        ISwapRouter.ExactInputSingleParams memory exactInputParams = ISwapRouter
+            .ExactInputSingleParams({
                 tokenIn: address(wsteth),
                 tokenOut: address(weth),
                 fee: 100,
@@ -96,14 +104,14 @@ contract UniswapTest is ForkBase {
             contractAddress: address(wsteth),
             encodedFunction: abi.encodeWithSelector(
                 wsteth.approve.selector,
-                address(uniswap),
+                address(uniswapAdapter),
                 wstethInAmount
             )
         });
         actions[1] = Action({
-            contractAddress: address(uniswap),
+            contractAddress: address(uniswapAdapter),
             encodedFunction: abi.encodeWithSelector(
-                uniswap.exactInputSingle.selector,
+                uniswapAdapter.exactInputSingle.selector,
                 exactInputParams
             )
         });
@@ -171,17 +179,18 @@ contract UniswapTest is ForkBase {
 
         // Format swap data
         // Instructions on formatting inputs: https://docs.uniswap.org/contracts/v3/guides/swaps/multihop-swaps
-        ExactInputParams memory exactInputParams = ExactInputParams({
-            path: abi.encodePacked(
-                address(wsteth),
-                uint24(100), // 0.01% pool fee
-                address(weth)
-            ),
-            recipient: address(handler),
-            deadline: block.timestamp + 3600,
-            amountIn: wstethInAmount,
-            amountOutMinimum: wethExpectedOutAmount
-        });
+        ISwapRouter.ExactInputParams memory exactInputParams = ISwapRouter
+            .ExactInputParams({
+                path: abi.encodePacked(
+                    address(wsteth),
+                    uint24(100), // 0.01% pool fee
+                    address(weth)
+                ),
+                recipient: address(handler),
+                deadline: block.timestamp + 3600,
+                amountIn: wstethInAmount,
+                amountOutMinimum: wethExpectedOutAmount
+            });
 
         // Format approve and swap call in actions
         Action[] memory actions = new Action[](2);
@@ -189,14 +198,14 @@ contract UniswapTest is ForkBase {
             contractAddress: address(wsteth),
             encodedFunction: abi.encodeWithSelector(
                 wsteth.approve.selector,
-                address(uniswap),
+                address(uniswapAdapter),
                 wstethInAmount
             )
         });
         actions[1] = Action({
-            contractAddress: address(uniswap),
+            contractAddress: address(uniswapAdapter),
             encodedFunction: abi.encodeWithSelector(
-                uniswap.exactInput.selector,
+                uniswapAdapter.exactInput.selector,
                 exactInputParams
             )
         });
