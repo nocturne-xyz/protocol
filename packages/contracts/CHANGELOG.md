@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- 1131f3e: remove unnecessary fields from `DepositRetrieved` and `DepositCompleted`
+
+### Minor Changes
+
+- f1b2deb: Add UniswapV3Adapter to validate calldata after audit finding
+
+### Patch Changes
+
+- 0848a7b: add check for ops with no joinsplits
+
 ## 1.2.1
 
 ### Patch Changes
