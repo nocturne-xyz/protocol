@@ -46,7 +46,8 @@ contract UniswapV3Adapter is Ownable {
     function exactInputSingle(
         ISwapRouter.ExactInputSingleParams memory params
     ) external returns (uint256 amountOut) {
-        require(_allowedTokens[params.tokenIn], "!allowed token");
+        require(_allowedTokens[params.tokenIn], "!tokenIn");
+        require(_allowedTokens[params.tokenOut], "!tokenOut");
         require(params.recipient == msg.sender, "!recipient");
 
         IERC20(params.tokenIn).transferFrom(
