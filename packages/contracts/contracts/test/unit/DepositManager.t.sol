@@ -50,22 +50,11 @@ contract DepositManagerTest is Test, PoseidonDeployer {
         uint256 gasCompensation
     );
 
-    event DepositRetrieved(
-        address indexed spender,
-        EncodedAsset encodedAsset,
-        uint256 value,
-        CompressedStealthAddress depositAddr,
-        uint256 nonce,
-        uint256 gasCompensation
-    );
+    event DepositRetrieved(bytes32 indexed depositHash);
 
     event DepositCompleted(
-        address indexed spender,
-        EncodedAsset encodedAsset,
-        uint256 value,
-        CompressedStealthAddress depositAddr,
-        uint256 nonce,
-        uint256 gasCompensation,
+        bytes32 indexed depositHash,
+        uint256 gasPaid,
         uint128 merkleIndex
     );
 
@@ -408,14 +397,7 @@ contract DepositManagerTest is Test, PoseidonDeployer {
 
         // Call retrieveDeposit
         vm.expectEmit(true, true, true, true);
-        emit DepositRetrieved(
-            deposit.spender,
-            deposit.encodedAsset,
-            deposit.value,
-            deposit.depositAddr,
-            deposit.nonce,
-            deposit.gasCompensation
-        );
+        emit DepositRetrieved(depositHash);
         vm.prank(ALICE);
         depositManager.retrieveDeposit(deposit);
 
@@ -470,14 +452,7 @@ contract DepositManagerTest is Test, PoseidonDeployer {
 
         // Call retrieveDeposit
         vm.expectEmit(true, true, true, true);
-        emit DepositRetrieved(
-            deposit.spender,
-            deposit.encodedAsset,
-            deposit.value,
-            deposit.depositAddr,
-            deposit.nonce,
-            deposit.gasCompensation
-        );
+        emit DepositRetrieved(depositHash);
         vm.prank(ALICE);
         depositManager.retrieveETHDeposit(deposit);
 
@@ -594,11 +569,7 @@ contract DepositManagerTest is Test, PoseidonDeployer {
 
         vm.expectEmit(true, true, true, false);
         emit DepositCompleted(
-            deposit.spender,
-            deposit.encodedAsset,
-            deposit.value,
-            deposit.depositAddr,
-            deposit.nonce,
+            depositHash,
             deposit.gasCompensation,
             merkleIndex
         );
@@ -693,11 +664,7 @@ contract DepositManagerTest is Test, PoseidonDeployer {
 
             vm.expectEmit(true, true, true, false);
             emit DepositCompleted(
-                deposits[i].spender,
-                deposits[i].encodedAsset,
-                deposits[i].value,
-                deposits[i].depositAddr,
-                deposits[i].nonce,
+                depositHashes[i],
                 deposits[i].gasCompensation,
                 merkleIndex
             );

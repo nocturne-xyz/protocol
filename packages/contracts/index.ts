@@ -24,8 +24,9 @@ export type { WETH9 } from './src/WETH9';
 export type { WstethAdapter } from './src/WstethAdapter';
 export type { RethAdapter } from './src/RethAdapter';
 export type { EthTransferAdapter } from './src/EthTransferAdapter';
-export type { IUniswapV3 } from './src/IUniswapV3';
+export type { UniswapV3Adapter } from './src/UniswapV3Adapter';
 export type { IBalancer } from './src/IBalancer';
+export type { ISwapRouter } from './src/ISwapRouter';
 
 export type { SimpleERC20Token } from './src/SimpleERC20Token';
 export type { SimpleERC721Token } from './src/SimpleERC721Token';
@@ -51,9 +52,10 @@ export { WETH9__factory } from './src/factories/WETH9__factory';
 export { WstethAdapter__factory } from './src/factories/WstethAdapter__factory';
 export { RethAdapter__factory } from './src/factories/RethAdapter__factory';
 export { EthTransferAdapter__factory } from './src/factories/EthTransferAdapter__factory';
+export { UniswapV3Adapter__factory } from './src/factories/UniswapV3Adapter__factory';
 
-export { IUniswapV3__factory } from './src/factories/IUniswapV3__factory';
 export { IBalancer__factory } from './src/factories/IBalancer__factory';
+export { ISwapRouter__factory } from './src/factories/ISwapRouter__factory';
 
 export { TransparentUpgradeableProxy__factory } from './src/factories/TransparentUpgradeableProxy__factory';
 export { ProxyAdmin__factory } from './src/factories/ProxyAdmin__factory';
@@ -61,7 +63,12 @@ export { Versioned__factory } from './src/factories/Versioned__factory';
 
 export { version } from './package.json';
 
-export async function getPoseidonBytecode(contractName: string): Promise<string> {
+export async function getPoseidonBytecode(
+  contractName: string,
+): Promise<string> {
   const fs = await import('fs');
-  return await fs.promises.readFile(`${__dirname}/poseidon-bytecode/${contractName}.txt`, 'utf-8');
+  return await fs.promises.readFile(
+    `${__dirname}/poseidon-bytecode/${contractName}.txt`,
+    'utf-8',
+  );
 }

@@ -15,13 +15,16 @@ library Validation {
     uint256 constant COMPRESSED_POINT_Y_MASK = ~uint256(1 << 254);
 
     function validateOperation(Operation calldata op) internal view {
+        uint256 numPubJoinSplits = op.pubJoinSplits.length;
+        require(numPubJoinSplits + op.confJoinSplits.length > 0, "!JoinSplits");
+
         // Ensure public spend > 0 for public joinsplit. Ensures handler only deals
         // with assets that are actually unwrappable. If asset has > 0 public spend, then
         // circuit guarantees that note with the _revealed_ asset is included in the tree is
         // unwrappable. If asset has public spend = 0, circuit guarantees that the note with the
         // _masked_ asset is included in the tree and unwrappable, but the revealed asset for public
         // spend = 0 is (0,0) and is not unwrappable.
-        for (uint256 i = 0; i < op.pubJoinSplits.length; i++) {
+        for (uint256 i = 0; i < numPubJoinSplits; i++) {
             require(op.pubJoinSplits[i].publicSpend > 0, "0 public spend");
         }
 

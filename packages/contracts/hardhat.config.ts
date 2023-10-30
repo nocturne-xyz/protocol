@@ -28,7 +28,7 @@ subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(
         p.includes('SimpleERC1155Token') ||
         p.includes('WETH9') ||
         p.includes('IBalancer') ||
-        p.includes('IUniswapV3'),
+        p.includes('SwapRouter'),
     );
   },
 );
@@ -102,13 +102,14 @@ module.exports = {
       'WstethAdapter',
       'RethAdapter',
       'EthTransferAdapter',
+      'UniswapV3Adapter',
       'CanonAddrSigCheckVerifier',
       'SimpleERC20Token',
       'SimpleERC721Token',
       'SimpleERC1155Token',
       'WETH9',
       'IBalancer',
-      'IUniswapV3',
+      'ISwapRouter',
       'TestSubtreeUpdateVerifier',
       'TransparentUpgradeableProxy',
       'ProxyAdmin',

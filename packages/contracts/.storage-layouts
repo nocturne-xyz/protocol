@@ -181,6 +181,5 @@
 | _handler           | contract IHandler           | 303  | 0      | 20    | packages/contracts/contracts/Teller.sol:Teller |
 | _joinSplitVerifier | contract IJoinSplitVerifier | 304  | 0      | 20    | packages/contracts/contracts/Teller.sol:Teller |
 | _depositSources    | mapping(address => bool)    | 305  | 0      | 32    | packages/contracts/contracts/Teller.sol:Teller |
-| _bundlers          | mapping(address => bool)    | 306  | 0      | 32    | packages/contracts/contracts/Teller.sol:Teller |
-| _poseidonExtT7     | contract IPoseidonExtT7     | 307  | 0      | 20    | packages/contracts/contracts/Teller.sol:Teller |
-| __GAP              | uint256[50]                 | 308  | 0      | 1600  | packages/contracts/contracts/Teller.sol:Teller |
+| _poseidonExtT7     | contract IPoseidonExtT7     | 306  | 0      | 20    | packages/contracts/contracts/Teller.sol:Teller |
+| __GAP              | uint256[50]                 | 307  | 0      | 1600  | packages/contracts/contracts/Teller.sol:Teller |
