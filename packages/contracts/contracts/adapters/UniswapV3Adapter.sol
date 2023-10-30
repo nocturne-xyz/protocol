@@ -40,8 +40,8 @@ contract UniswapV3Adapter is Ownable {
         emit TokenPermissionSet(token, permission);
     }
 
-    /// @notice Proxy for exactInputSingle function of Uniswap SwapRouter. Ensures tokenIn
-    ///         is allowed and recipient is caller.
+    /// @notice Proxy for exactInputSingle function of Uniswap SwapRouter. Ensures tokenIn and 
+    ///         tokenOut are allowed and recipient is caller.
     /// @param params ExactInputSingleParams (see ISwapRouter)
     function exactInputSingle(
         ISwapRouter.ExactInputSingleParams memory params
