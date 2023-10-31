@@ -108,6 +108,7 @@ contract DepositManager is
         address weth
     ) external initializer {
         __Ownable2Step_init();
+        __ReentrancyGuard_init();
         __DepositRequestEIP712_init(contractName, contractVersion);
         _teller = ITeller(teller);
         _weth = IWeth(weth);
