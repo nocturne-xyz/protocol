@@ -17,7 +17,7 @@ contract RethAdapter {
     IWeth public _weth;
 
     // Rocket pool storage interface
-    IRocketStorage _rocketStorage;
+    IRocketStorage public _rocketStorage;
 
     // Constructor, takes weth and reth
     constructor(address weth, address rocketStorage) {
