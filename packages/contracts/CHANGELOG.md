@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.1
+
+### Patch Changes
+
+- 5a525bf: initialize ReentrancyGuard upgradeable in DepositManager initialization function
+- 1cbbc76: Add tokenOut check for exactInputSingle in UniswapV3Adapter
+- a3fd094: Make rocketpool storage contract public on rETHAdapter
+
 ## 2.0.0
 
 ### Major Changes
