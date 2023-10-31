@@ -40,13 +40,14 @@ contract UniswapV3Adapter is Ownable {
         emit TokenPermissionSet(token, permission);
     }
 
-    /// @notice Proxy for exactInputSingle function of Uniswap SwapRouter. Ensures tokenIn
-    ///         is allowed and recipient is caller.
+    /// @notice Proxy for exactInputSingle function of Uniswap SwapRouter. Ensures tokenIn and
+    ///         tokenOut are allowed and recipient is caller.
     /// @param params ExactInputSingleParams (see ISwapRouter)
     function exactInputSingle(
         ISwapRouter.ExactInputSingleParams memory params
     ) external returns (uint256 amountOut) {
-        require(_allowedTokens[params.tokenIn], "!allowed token");
+        require(_allowedTokens[params.tokenIn], "!tokenIn");
+        require(_allowedTokens[params.tokenOut], "!tokenOut");
         require(params.recipient == msg.sender, "!recipient");
 
         IERC20(params.tokenIn).transferFrom(
