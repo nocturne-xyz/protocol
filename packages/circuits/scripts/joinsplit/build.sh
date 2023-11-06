@@ -22,11 +22,11 @@ if [ ! -d "$BUILD_DIR" ]; then
     mkdir -p "$BUILD_DIR"
 fi
 
-echo "****COMPILING CIRCUIT****"
-start=`date +%s`
-circom "$CIRCUIT_PATH" --r1cs --wasm --sym --c --wat --output "$BUILD_DIR"
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****COMPILING CIRCUIT****"
+# start=`date +%s`
+# circom "$CIRCUIT_PATH" --r1cs --wasm --sym --c --wat --output "$BUILD_DIR"
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
 # echo "****GENERATING WITNESS FOR SAMPLE INPUT****"
 # start=`date +%s`
@@ -34,35 +34,35 @@ echo "DONE ($((end-start))s)"
 # end=`date +%s`
 # echo "DONE ($((end-start))s)"
 
-echo "****GENERATING ZKEY 0****"
-start=`date +%s`
-npx snarkjs groth16 setup "$BUILD_DIR"/"$CIRCUIT_NAME".r1cs "$PHASE1_PATH" "$OUTPUT_DIR"/"$CIRCUIT_NAME"_0.zkey
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****GENERATING ZKEY 0****"
+# start=`date +%s`
+# npx snarkjs groth16 setup "$BUILD_DIR"/"$CIRCUIT_NAME".r1cs "$PHASE1_PATH" "$OUTPUT_DIR"/"$CIRCUIT_NAME"_0.zkey
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
-echo "****CONTRIBUTE TO THE PHASE 2 CEREMONY****"
-start=`date +%s`
-echo "test" | npx snarkjs zkey contribute "$OUTPUT_DIR"/"$CIRCUIT_NAME"_0.zkey "$OUTPUT_DIR"/"$CIRCUIT_NAME"_1.zkey --name="1st Contributor Name"
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****CONTRIBUTE TO THE PHASE 2 CEREMONY****"
+# start=`date +%s`
+# echo "test" | npx snarkjs zkey contribute "$OUTPUT_DIR"/"$CIRCUIT_NAME"_0.zkey "$OUTPUT_DIR"/"$CIRCUIT_NAME"_1.zkey --name="1st Contributor Name"
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
-echo "****GENERATING FINAL ZKEY****"
-start=`date +%s`
-npx snarkjs zkey beacon "$OUTPUT_DIR"/"$CIRCUIT_NAME"_1.zkey "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey 0102030405060708090a0b0c0d0e0f101112231415161718221a1b1c1d1e1f 10 -n="Final Beacon phase2"
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****GENERATING FINAL ZKEY****"
+# start=`date +%s`
+# npx snarkjs zkey beacon "$OUTPUT_DIR"/"$CIRCUIT_NAME"_1.zkey "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey 0102030405060708090a0b0c0d0e0f101112231415161718221a1b1c1d1e1f 10 -n="Final Beacon phase2"
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
-echo "****VERIFYING FINAL ZKEY****"
-start=`date +%s`
-npx snarkjs zkey verify "$BUILD_DIR"/"$CIRCUIT_NAME".r1cs "$PHASE1_PATH" "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****VERIFYING FINAL ZKEY****"
+# start=`date +%s`
+# npx snarkjs zkey verify "$BUILD_DIR"/"$CIRCUIT_NAME".r1cs "$PHASE1_PATH" "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
-echo "****EXPORTING VKEY****"
-start=`date +%s`
-npx snarkjs zkey export verificationkey "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey "$OUTPUT_DIR"/vkey.json
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****EXPORTING VKEY****"
+# start=`date +%s`
+# npx snarkjs zkey export verificationkey "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey "$OUTPUT_DIR"/vkey.json
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
 # echo "****GENERATING PROOF FOR SAMPLE INPUT****"
 # start=`date +%s`
