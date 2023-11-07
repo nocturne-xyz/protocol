@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0
+
+### Major Changes
+
+- c2bcb2e: update circuit artifacts with final zkeys from trusted setup
+
 ## 0.5.0
 
 ### Minor Changes

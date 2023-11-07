@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.0
+
+### Major Changes
+
+- c2bcb2e: update circuit artifacts with final zkeys from trusted setup
+
+### Patch Changes
+
+- c9a4d4f: don't restrict recipient of uniswap adapter to allow swap outputs to fresh addresses
+
 ## 2.0.1
 
 ### Patch Changes
