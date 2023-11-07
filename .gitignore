@@ -42,6 +42,7 @@ circuit-artifacts/**/*.*
 !circuit-artifacts/*/*_js/*.wasm
 !circuit-artifacts/*/*_cpp/*.zkey
 !circuit-artifacts/*/*_cpp/*.json
+!circuit-artifacts/subtreeupdate_vkey.json
 
 # ignore subtreeupdate because it's verification key is too huge
 circuit-artifacts/subtreeupdate

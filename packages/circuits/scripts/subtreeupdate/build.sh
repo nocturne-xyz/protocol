@@ -23,11 +23,11 @@ if [ ! -d "$BUILD_DIR" ]; then
     mkdir -p "$BUILD_DIR"
 fi
 
-echo "****COMPILING CIRCUIT****"
-start=`date +%s`
-circom "$CIRCUIT_PATH" --r1cs --wasm --sym --c --wat --output "$BUILD_DIR"
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****COMPILING CIRCUIT****"
+# start=`date +%s`
+# circom "$CIRCUIT_PATH" --r1cs --wasm --sym --c --wat --output "$BUILD_DIR"
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
 # echo "****GENERATING WITNESS FOR SAMPLE INPUT****"
 # start=`date +%s`
@@ -35,11 +35,11 @@ echo "DONE ($((end-start))s)"
 # end=`date +%s`
 # echo "DONE ($((end-start))s)"
 
-echo "****GENERATING ZKEY 0****"
-start=`date +%s`
-npx snarkjs groth16 setup "$BUILD_DIR"/"$CIRCUIT_NAME".r1cs "$PHASE1_PATH" "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****GENERATING ZKEY 0****"
+# start=`date +%s`
+# npx snarkjs groth16 setup "$BUILD_DIR"/"$CIRCUIT_NAME".r1cs "$PHASE1_PATH" "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
 # echo "****CONTRIBUTE TO THE PHASE 2 CEREMONY****"
 # start=`date +%s`
@@ -59,11 +59,11 @@ echo "DONE ($((end-start))s)"
 # end=`date +%s`
 # echo "DONE ($((end-start))s)"
 
-echo "****EXPORTING VKEY****"
-start=`date +%s`
-npx snarkjs zkey export verificationkey "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey "$OUTPUT_DIR"/vkey.json
-end=`date +%s`
-echo "DONE ($((end-start))s)"
+# echo "****EXPORTING VKEY****"
+# start=`date +%s`
+# npx snarkjs zkey export verificationkey "$OUTPUT_DIR"/"$CIRCUIT_NAME".zkey "$OUTPUT_DIR"/vkey.json
+# end=`date +%s`
+# echo "DONE ($((end-start))s)"
 
 # echo "****GENERATING PROOF FOR SAMPLE INPUT****"
 # start=`date +%s`
