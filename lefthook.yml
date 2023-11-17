@@ -1,4 +1,4 @@
-#   Refer for explanation to following link:
+#   Refer for explanation to the following link:
 #   https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
 pre-commit:
   parallel: true

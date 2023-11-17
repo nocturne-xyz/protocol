@@ -20,7 +20,7 @@
 /***************************************************************************************************
 Each level on a SMTProcessor has a state.
 
-The state of the level depends on the state of te botom level and on `xor` and
+The state of the level depends on the state of the bottom level and on `xor` and
 `is0` signals.
 
 `isOldLev` 1 when is the level where oldLeaf is.
@@ -33,10 +33,10 @@ are inserting/deleting in a leaf that contains an element.
 
 The states are:
 
-top: While the index bits of the old and new insex in the top level is the same, whe are in the top state.
-old0: When the we reach insert level,  we go to old0 state
+top: While the index bits of the old and new index in the top level is the same, we are in the top state.
+old0: When the we reach insert level, we go to old0 state
 if `is0`=1.
-btn: Once in insert level and `is0` =0 we go to btn or new1 level if xor=1
+btn: Once in insert level and `is0` =0 we go to btn or new1 level if xor=1.
 new1: This level is reached when xor=1. Here is where we insert/delete the hash of the
 old and the new trees with just one element.
 na: Not appliable.  After processing it, we go to the na level.

@@ -6,10 +6,10 @@ import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 /// @title EthTransferAdapter
 /// @author Nocturne Labs
-/// @notice Adapter contract for converting weth to eth and transfering eth to specified address.
+/// @notice Adapter contract for converting weth to eth and transferring eth to specified address.
 ///         The Handler contract does not support ETH value transfers directly, thus we need a thin
 ///         adapter for handling the weth -> eth step then transferring the eth.
-/// @dev Note that we ensure the recipient is is an EOA to avoid reentrancy. Reentrancy would allow
+/// @dev Note that we ensure the recipient is an EOA to avoid reentrancy. Reentrancy would allow
 ///      a recipient to send back funds to the Handler and bypass deposit limits.
 contract EthTransferAdapter {
     // Weth contract

@@ -9,6 +9,6 @@ This repo includes the circuits and smart contracts comprising the Nocturne prot
 - `yarn build` (builds only contracts)
 - `yarn test:unit`
 
-### Building circuits
+### Building Circuits
 
 Circuits can be built by running `yarn build:<circuit-name>` from the `circuits` package directory, or `yarn build:all` to build all of them at once.
