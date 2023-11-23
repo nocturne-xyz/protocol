@@ -1,4 +1,7 @@
 # Nocturne Protocol
+[![Twitter Follow](https://img.shields.io/twitter/follow/norturne_xyz?style=social)](https://twitter.com/nocturne_xyz)
+[![Discord](https://img.shields.io/discord/984015101017346058?color=%235865F2&label=Discord&logo=discord&logoColor=%23fff)](https://discord.com/invite/MxZYtzzFmJ)
+
 
 This repo includes the circuits and smart contracts comprising the Nocturne protocol.
 
